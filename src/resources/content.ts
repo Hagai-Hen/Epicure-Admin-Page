@@ -16,5 +16,9 @@ export const DASHBOARD = {
         BODY: 'Once deleted, this action cannot be undone.',
         CANCEL: 'Cancel',
         DELETE: 'Delete'
+    },
+    HEADER: {
+        BACK: 'Back',
+        ENTRIES: 'entries was found'
     }
 }

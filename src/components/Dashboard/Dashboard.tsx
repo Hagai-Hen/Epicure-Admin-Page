@@ -1,4 +1,12 @@
-import { DashboardContainer } from "./styles";
+import {
+  DashboardBackContainer,
+  DashboardBackIcon,
+  DashboardContainer,
+  DashboardHeaderBack,
+  DashboardHeaderContainer,
+  DashboardHeaderEntries,
+  DashboardHeaderTitle,
+} from "./styles";
 import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
@@ -13,6 +21,8 @@ import {
 import { renderActionsCell } from "./columns";
 import { DASHBOARD } from "../../resources/content";
 import { GridColDef } from "@mui/x-data-grid";
+import { useNavigate } from "react-router-dom";
+
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
@@ -41,6 +51,8 @@ export const Dashboard = ({
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const paginationModel = { page: 0, pageSize: 5 };
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     setActivePage(pageName);
@@ -106,10 +118,28 @@ export const Dashboard = ({
     return col;
   });
 
+
+
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
   return (
     <>
       <DashboardContainer>
-        <Paper sx={{ height: 400, width: "80%" }}>
+        <DashboardHeaderContainer>
+          <DashboardBackContainer onClick={handleBackClick}>
+            <DashboardBackIcon />
+            <DashboardHeaderBack>{DASHBOARD.HEADER.BACK}</DashboardHeaderBack>
+          </DashboardBackContainer>
+          <DashboardHeaderTitle>
+            {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
+          </DashboardHeaderTitle>
+          <DashboardHeaderEntries>
+            {data.length} {DASHBOARD.HEADER.ENTRIES}
+          </DashboardHeaderEntries>
+        </DashboardHeaderContainer>
+        <Paper sx={{ height: "50%", width: "90%" }}>
           <DataGrid
             rows={rowsData}
             columns={updatedColumns}

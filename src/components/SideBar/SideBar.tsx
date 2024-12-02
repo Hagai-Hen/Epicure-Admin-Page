@@ -11,7 +11,7 @@ import {
   HeaderText,
   Divider,
 } from "./styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SIDE_BAR } from "../../resources/content";
 import { useNavigate } from "react-router-dom";
 
@@ -26,13 +26,16 @@ export const SideBar = ({
   activePage,
   setActivePage,
 }: SideBarProps) => {
-  const [activeItem, setActiveItem] = useState<number>();
   const navigate = useNavigate();
 
-  const handleClick = (index: number, item: string) => {
-    setActiveItem(index);
+  useEffect(() => {
+    const currentPage = location.pathname.split('/').pop() || '';
+    setActivePage(currentPage.toLowerCase());
+  }, [location.pathname, setActivePage]);
+
+  const handleClick = (item: string) => {
     navigate(item);
-    setActivePage(item)
+    setActivePage(item);
   };
   return (
     <>
@@ -51,16 +54,16 @@ export const SideBar = ({
         {collections.map((item: string, index) => (
           <SideBarItem
             key={index}
-            isActive={
-              activeItem === index || item.toLocaleLowerCase() === activePage
-            }
-            onClick={() => handleClick(index, item)}
+            isActive={item.toLocaleLowerCase() === activePage}
+            onClick={() => handleClick(item)}
           >
             <SmallCircleIcon
-              isActive={activeItem === index}
+              isActive={item.toLocaleLowerCase() === activePage}
               sx={{ fontSize: 6 }}
             />
-            <SideBarCollection isActive={activeItem === index}>
+            <SideBarCollection
+              isActive={item.toLocaleLowerCase() === activePage}
+            >
               {item}
             </SideBarCollection>
           </SideBarItem>
