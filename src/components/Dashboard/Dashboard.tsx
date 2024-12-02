@@ -1,5 +1,5 @@
 import { DashboardContainer } from "./styles";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import {
@@ -14,6 +14,7 @@ import { columns, renderActionsCell } from './columns';  // Import the columns c
 
 interface SideBarProps {
   data: string[];
+  setActivePage: (page: string) => void;
 }
 
 interface RowData {
@@ -35,13 +36,17 @@ const initialRows = [
   { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
 ];
 
-export const Dashboard = ({ data }: SideBarProps) => {
+export const Dashboard = ({ data, setActivePage }: SideBarProps) => {
   const [rowsData, setRowsData] = useState<RowData[]>(initialRows);
   const [editingRow, setEditingRow] = useState<any>(null); // Row being edited
   const [editedRowData, setEditedRowData] = useState<any>({}); // Data of the row being edited
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // Open confirmation dialog for delete
   const [rowToDelete, setRowToDelete] = useState<any>(null); // Row to be deleted
   const paginationModel = { page: 0, pageSize: 5 };
+
+  useEffect(() => {
+    setActivePage("REST");
+  }, []);
 
   // Handle row deletion
   const handleDelete = (id: number) => {

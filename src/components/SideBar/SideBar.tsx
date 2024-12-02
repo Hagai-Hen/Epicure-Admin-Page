@@ -13,16 +13,20 @@ import {
 } from "./styles";
 import { useState } from "react";
 import { SIDE_BAR } from "../../resources/content";
+import { useNavigate } from "react-router-dom";
 
 interface SideBarProps {
   collections: string[];
+  activePage: string;
 }
 
-export const SideBar = ({ collections }: SideBarProps) => {
+export const SideBar = ({ collections, activePage }: SideBarProps) => {
   const [activeItem, setActiveItem] = useState<number>();
+  const navigate = useNavigate();
 
-  const handleClick = (index: number) => {
+  const handleClick = (index: number, item: string) => {
     setActiveItem(index);
+    navigate(item);
   };
   return (
     <>
@@ -42,7 +46,7 @@ export const SideBar = ({ collections }: SideBarProps) => {
           <SideBarItem
             key={index}
             isActive={activeItem === index}
-            onClick={() => handleClick(index)}
+            onClick={() => handleClick(index, item)}
           >
             <SmallCircleIcon
               isActive={activeItem === index}
