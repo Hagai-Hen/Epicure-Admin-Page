@@ -11,25 +11,35 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { renderActionsCell } from "./columns";
+import { DASHBOARD } from "../../resources/content";
+import { GridColDef } from "@mui/x-data-grid";
+
+interface Column extends Omit<GridColDef, "renderCell"> {
+  renderCell?: (params: any) => JSX.Element;
+}
 
 interface SideBarProps {
-  data: string[];
+  data: RowData[];
   setActivePage: (page: string) => void;
-  columnData: Object[];
+  columnData: Column[];
   pageName: string;
+}
+
+interface RowData {
+  id: string;
 }
 
 export const Dashboard = ({
   data,
   setActivePage,
   columnData,
-  pageName
+  pageName,
 }: SideBarProps) => {
-  const [rowsData, setRowsData] = useState(data);
-  const [editingRow, setEditingRow] = useState(null);
-  const [editedRowData, setEditedRowData] = useState({});
+  const [rowsData, setRowsData] = useState<RowData[]>(data);
+  const [editingRow, setEditingRow] = useState<RowData | null>(null);
+  const [editedRowData, setEditedRowData] = useState<RowData | any>({});
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [rowToDelete, setRowToDelete] = useState(null);
+  const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const paginationModel = { page: 0, pageSize: 5 };
 
   useEffect(() => {
@@ -37,9 +47,9 @@ export const Dashboard = ({
     setRowsData(data);
   }, [pageName]);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     const row = rowsData.find((row) => row.id === id);
-    setRowToDelete(row);
+    if (row) setRowToDelete(row);
     setOpenDeleteDialog(true);
   };
 
@@ -58,7 +68,7 @@ export const Dashboard = ({
     setOpenDeleteDialog(false);
   };
 
-  const handleEdit = (row: string[]) => {
+  const handleEdit = (row: RowData) => {
     setEditingRow(row);
     setEditedRowData({ ...row });
   };
@@ -112,7 +122,7 @@ export const Dashboard = ({
       </DashboardContainer>
 
       <Dialog open={editingRow !== null} onClose={handleCancelEdit}>
-        <DialogTitle>Edit Row</DialogTitle>
+        <DialogTitle>{DASHBOARD.EDIT_DIALOG.TITLE}</DialogTitle>
         <DialogContent>
           {columnData?.map((col: any) => {
             const { field, headerName, type } = col;
@@ -135,25 +145,25 @@ export const Dashboard = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancelEdit} color="primary">
-            Cancel
+            {DASHBOARD.EDIT_DIALOG.CANCEL}
           </Button>
           <Button onClick={handleSaveEdit} color="primary">
-            Save
+            {DASHBOARD.EDIT_DIALOG.SAVE}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={openDeleteDialog} onClose={cancelDelete}>
-        <DialogTitle>Are you sure you want to delete?</DialogTitle>
+        <DialogTitle>{DASHBOARD.DELETE_DIALOG.TITLE}</DialogTitle>
         <DialogContent>
-          <p>Once deleted, this action cannot be undone.</p>
+          <p>{DASHBOARD.DELETE_DIALOG.BODY}</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelDelete} color="primary">
-            Cancel
+            {DASHBOARD.DELETE_DIALOG.CANCEL}
           </Button>
           <Button onClick={confirmDelete} color="secondary" variant="contained">
-            Delete
+            {DASHBOARD.DELETE_DIALOG.DELETE}
           </Button>
         </DialogActions>
       </Dialog>
