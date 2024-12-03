@@ -1,4 +1,5 @@
 import {
+  CustomPaper,
   DashboardBackContainer,
   DashboardBackIcon,
   DashboardContainer,
@@ -10,7 +11,7 @@ import {
   DashboardLeftHeader,
   DashboardRightHeader,
 } from "./styles";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import {
@@ -51,64 +52,70 @@ export const Dashboard = ({
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
-  const [newRowData, setNewRowData] = useState<any>({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEditFormValid, setIsEditFormValid] = useState(true);
-
   const paginationModel = { page: 0, pageSize: 5 };
+  const navigate = useNavigate();
 
   const { collection } = useParams<{ collection: string }>();
+  let displayName = "";
+  if (collection)
+    displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
 
-  const navigate = useNavigate();
+  const newRowDataInitial = useMemo(() => {
+    return columnData.reduce((acc: any, col: Column) => {
+      if (col.field !== "actions") {
+        acc[col.field] = "";
+      }
+      return acc;
+    }, {});
+  }, [columnData]);
+  const [newRowData, setNewRowData] = useState<any>(newRowDataInitial);
 
   useEffect(() => {
     setActivePage(collection || "");
     setRowsData(data);
   }, [collection]);
 
-  useEffect(() => {
-    const initialRowData = columnData.reduce((acc: any, col: Column) => {
-      if (col.field !== "actions") {
-        acc[col.field] = "";
-      }
-      return acc;
-    }, {});
-    setNewRowData(initialRowData);
-  }, [columnData]);
-
-  const handleCreateDialogOpen = () => {
+  const handleCreateDialogOpen = useCallback(() => {
     setOpenCreateDialog(true);
-  };
+  }, []);
 
-  const handleCreateFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const updatedRowData = { ...newRowData, [name]: value };
-    setNewRowData(updatedRowData);
+  const handleCreateFieldChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      const updatedRowData = { ...newRowData, [name]: value };
+      setNewRowData(updatedRowData);
 
-    const isValid = Object.values(updatedRowData).every((val) => val !== "");
-    setIsFormValid(isValid);
-  };
+      const isValid = Object.values(updatedRowData).every((val) => val !== "");
+      setIsFormValid(isValid);
+    },
+    [newRowData]
+  );
 
-  const handleSaveCreate = () => {
+  const handleSaveCreate = useCallback(() => {
     const newRow = { id: `${rowsData.length + 1}`, ...newRowData };
-    setRowsData([...rowsData, newRow]);
+    setRowsData((prevRows) => [...prevRows, newRow]);
     setNewRowData({});
     setOpenCreateDialog(false);
-  };
+  }, [rowsData, newRowData]);
 
-  const handleCancelCreate = () => {
+  const handleCancelCreate = useCallback(() => {
     setNewRowData({});
     setOpenCreateDialog(false);
     setIsFormValid(false);
-  };
+  }, []);
 
-  const handleDelete = (id: string) => {
-    const row = rowsData.find((row) => row.id === id);
-    if (row) setRowToDelete(row);
-    setOpenDeleteDialog(true);
-  };
+  const handleDelete = useCallback(
+    (id: string) => {
+      const row = rowsData.find((row) => row.id === id);
+      if (row) setRowToDelete(row);
+      setOpenDeleteDialog(true);
+    },
+    [rowsData]
+  );
 
-  const confirmDelete = () => {
+  const confirmDelete = useCallback(() => {
     if (rowToDelete) {
       setRowsData((prevRows) =>
         prevRows.filter((row) => row.id !== rowToDelete.id)
@@ -116,45 +123,47 @@ export const Dashboard = ({
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
-  };
+  }, [rowToDelete]);
 
-  const cancelDelete = () => {
+  const cancelDelete = useCallback(() => {
     setRowToDelete(null);
     setOpenDeleteDialog(false);
-  };
+  }, []);
 
-  const handleEdit = (row: RowData) => {
+  const handleEdit = useCallback((row: RowData) => {
     setEditingRow(row);
     setEditedRowData({ ...row });
-  };
+  }, []);
 
-  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditedRowData((prev: any) => {
-      const updated = { ...prev, [name]: value };
+  const handleFieldChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      setEditedRowData((prev: any) => {
+        const updated = { ...prev, [name]: value };
 
-      const isValid = Object.values(updated).every((val) => val !== "");
-      setIsEditFormValid(isValid);
-      return updated;
-    });
-  };
+        const isValid = Object.values(updated).every((val) => val !== "");
+        setIsEditFormValid(isValid);
+        return updated;
+      });
+    },
+    []
+  );
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = useCallback(() => {
     const updatedRows = rowsData.map((row) =>
       row.id === editingRow?.id ? { ...row, ...editedRowData } : row
     );
     setRowsData(updatedRows);
     setEditingRow(null);
-  };
+  }, [rowsData, editingRow, editedRowData]);
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = useCallback(() => {
     setEditingRow(null);
-  };
+  }, []);
 
-  const gridOptions = {
-    handleEdit,
-    handleDelete,
-  };
+  const handleBackClick = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
 
   const updatedColumns = columnData.map((col) => {
     if (col.field === "actions") {
@@ -167,12 +176,10 @@ export const Dashboard = ({
     return col;
   });
 
-  const handleBackClick = () => {
-    navigate(-1);
+  const gridOptions = {
+    handleEdit,
+    handleDelete,
   };
-  let displayName = "";
-  if (collection)
-    displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
 
   return (
     <>
@@ -194,16 +201,15 @@ export const Dashboard = ({
             </DashboardCreateButton>
           </DashboardRightHeader>
         </DashboardHeaderContainer>
-        <Paper sx={{ height: "50%", width: "90%" }}>
+        <CustomPaper>
           <DataGrid
             rows={rowsData}
             columns={updatedColumns}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[5, 10]}
             checkboxSelection
-            sx={{ border: 0 }}
           />
-        </Paper>
+        </CustomPaper>
       </DashboardContainer>
 
       {/* Create Dialog */}
