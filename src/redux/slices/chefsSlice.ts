@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ChefsData } from "../../resources/content";
+import { COLLECTIONS_DATA } from "../../resources/content";
 
 // Updated Chef Interface
 interface Chef {
@@ -15,7 +15,7 @@ interface ChefsState {
 }
 
 const initialState: ChefsState = {
-  chefs: ChefsData,
+  chefs: COLLECTIONS_DATA.CHEFS.data,
 };
 
 const chefsSlice = createSlice({

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RestaurantsData } from "../../resources/content";
+import { COLLECTIONS_DATA } from "../../resources/content";
 
 // Restaurant Interface
 interface Restaurant {
@@ -16,7 +16,7 @@ interface RestaurantsState {
 }
 
 const initialState: RestaurantsState = {
-  restaurants: RestaurantsData,
+  restaurants: COLLECTIONS_DATA.RESTAURANTS.data,
 };
 
 const restaurantSlice = createSlice({

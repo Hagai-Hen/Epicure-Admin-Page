@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DishesData } from "../../resources/content";
+import { COLLECTIONS_DATA } from "../../resources/content";
 
 // Dish Interface
 interface Dish {
@@ -17,7 +17,7 @@ interface DishesState {
 }
 
 const initialState: DishesState = {
-  dishes: DishesData,
+  dishes: COLLECTIONS_DATA.DISHES.data,
 };
 
 const dishSlice = createSlice({
@@ -48,5 +48,6 @@ const dishSlice = createSlice({
   },
 });
 
-export const { setDishes, createDish, updateDish, deleteDish } = dishSlice.actions;
+export const { setDishes, createDish, updateDish, deleteDish } =
+  dishSlice.actions;
 export default dishSlice.reducer;
