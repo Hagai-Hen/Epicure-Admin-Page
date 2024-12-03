@@ -25,20 +25,32 @@ import { renderActionsCell } from "./columns";
 import { DASHBOARD } from "../../resources/content";
 import { GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import {
+  createRestaurant,
+  deleteRestaurant,
+  updateRestaurant,
+} from "../../redux/slices/restaurantsSlice";
+import {
+  createChef,
+  deleteChef,
+  updateChef,
+} from "../../redux/slices/chefsSlice";
+import {
+  createDish,
+  deleteDish,
+  updateDish,
+} from "../../redux/slices/dishesSlice";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
 }
 
-interface SideBarProps {
-  data: RowData[];
+interface DashboardProps {
+  data: any[]; // Can be restaurants, chefs, or dishes
   setActivePage: (page: string) => void;
   columnData: Column[];
   pageName: string;
-}
-
-interface RowData {
-  id: string;
 }
 
 export const Dashboard = ({
@@ -46,30 +58,29 @@ export const Dashboard = ({
   setActivePage,
   columnData,
   pageName,
-}: SideBarProps) => {
-  const [rowsData, setRowsData] = useState<RowData[]>(data);
-  const [editingRow, setEditingRow] = useState<RowData | null>(null);
-  const [editedRowData, setEditedRowData] = useState<RowData | any>({});
+}: DashboardProps) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const [editingRow, setEditingRow] = useState<any | null>(null);
+  const [editedRowData, setEditedRowData] = useState<any>({});
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
+  const [rowToDelete, setRowToDelete] = useState<any | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [newRowData, setNewRowData] = useState<any>({});
-  const [isFormValid, setIsFormValid] = useState(false); 
-  const [isEditFormValid, setIsEditFormValid] = useState(true); 
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [isEditFormValid, setIsEditFormValid] = useState(true);
 
   const paginationModel = { page: 0, pageSize: 5 };
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     setActivePage(pageName);
-    setRowsData(data);
   }, [pageName]);
 
   useEffect(() => {
     const initialRowData = columnData.reduce((acc: any, col: Column) => {
       if (col.field !== "actions") {
-        acc[col.field] = ""; 
+        acc[col.field] = "";
       }
       return acc;
     }, {});
@@ -80,22 +91,28 @@ export const Dashboard = ({
     setOpenCreateDialog(true);
   };
 
-  const handleCreateDialogClose = () => {
-    setOpenCreateDialog(false);
-  };
-
   const handleCreateFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const updatedRowData = { ...newRowData, [name]: value };
     setNewRowData(updatedRowData);
 
     const isValid = Object.values(updatedRowData).every((val) => val !== "");
-    setIsFormValid(isValid); 
+    setIsFormValid(isValid);
   };
 
   const handleSaveCreate = () => {
-    const newRow = { id: `${rowsData.length + 1}`, ...newRowData };
-    setRowsData([...rowsData, newRow]);
+    const newRow = { id: `${data.length + 1}`, ...newRowData };
+    switch (pageName) {
+      case "restaurants":
+        dispatch(createRestaurant(newRow));
+        break;
+      case "chefs":
+        dispatch(createChef(newRow));
+        break;
+      case "dishes":
+        dispatch(createDish(newRow));
+        break;
+    }
     setNewRowData({});
     setOpenCreateDialog(false);
   };
@@ -107,16 +124,24 @@ export const Dashboard = ({
   };
 
   const handleDelete = (id: string) => {
-    const row = rowsData.find((row) => row.id === id);
+    const row = data.find((row: any) => row.id === id);
     if (row) setRowToDelete(row);
     setOpenDeleteDialog(true);
   };
 
   const confirmDelete = () => {
     if (rowToDelete) {
-      setRowsData((prevRows) =>
-        prevRows.filter((row) => row.id !== rowToDelete.id)
-      );
+      switch (pageName) {
+        case "restaurants":
+          dispatch(deleteRestaurant(rowToDelete.id));
+          break;
+        case "chefs":
+          dispatch(deleteChef(rowToDelete.id));
+          break;
+        case "dishes":
+          dispatch(deleteDish(rowToDelete.id));
+          break;
+      }
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
@@ -127,7 +152,7 @@ export const Dashboard = ({
     setOpenDeleteDialog(false);
   };
 
-  const handleEdit = (row: RowData) => {
+  const handleEdit = (row: any) => {
     setEditingRow(row);
     setEditedRowData({ ...row });
   };
@@ -136,18 +161,24 @@ export const Dashboard = ({
     const { name, value } = e.target;
     setEditedRowData((prev: any) => {
       const updated = { ...prev, [name]: value };
-
       const isValid = Object.values(updated).every((val) => val !== "");
-      setIsEditFormValid(isValid); 
+      setIsEditFormValid(isValid);
       return updated;
     });
   };
 
   const handleSaveEdit = () => {
-    const updatedRows = rowsData.map((row) =>
-      row.id === editingRow?.id ? { ...row, ...editedRowData } : row
-    );
-    setRowsData(updatedRows);
+    switch (pageName) {
+      case "restaurants":
+        dispatch(updateRestaurant(editedRowData));
+        break;
+      case "chefs":
+        dispatch(updateChef(editedRowData));
+        break;
+      case "dishes":
+        dispatch(updateDish(editedRowData));
+        break;
+    }
     setEditingRow(null);
   };
 
@@ -199,7 +230,7 @@ export const Dashboard = ({
         </DashboardHeaderContainer>
         <Paper sx={{ height: "50%", width: "90%" }}>
           <DataGrid
-            rows={rowsData}
+            rows={data}
             columns={updatedColumns}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[5, 10]}
@@ -215,9 +246,8 @@ export const Dashboard = ({
         <DialogContent>
           {columnData?.map((col: any) => {
             const { field, headerName, type } = col;
-            if (field === "actions") return null; 
+            if (field === "actions") return null;
             const value = newRowData[field] || "";
-
             return (
               <TextField
                 key={field}
@@ -239,7 +269,7 @@ export const Dashboard = ({
           <Button
             onClick={handleSaveCreate}
             color="primary"
-            disabled={!isFormValid} 
+            disabled={!isFormValid}
           >
             {DASHBOARD.CREATE_DIALOG.CREATE}
           </Button>
@@ -252,7 +282,7 @@ export const Dashboard = ({
         <DialogContent>
           {columnData?.map((col: any) => {
             const { field, headerName, type } = col;
-            if (field === "actions") return null; 
+            if (field === "actions") return null;
             const value = editedRowData[field] || "";
 
             return (
@@ -276,7 +306,7 @@ export const Dashboard = ({
           <Button
             onClick={handleSaveEdit}
             color="primary"
-            disabled={!isEditFormValid} 
+            disabled={!isEditFormValid}
           >
             {DASHBOARD.EDIT_DIALOG.SAVE}
           </Button>

@@ -177,7 +177,6 @@ export const DishesData = [
       "Shrimps, Glass Noodles, Kemiri Nuts, Shallots, Lemon Grass, Magic Chili Brown Coconut",
     tags: ["spicy"],
     restaurant: "6745f3ea965ba597781b838d",
-    __v: 0,
     img: "https://res.cloudinary.com/dl0qa9k1r/image/upload/v1732807837/oq2r4o1as0yuibj9ruvm.svg",
   },
   {
@@ -188,7 +187,6 @@ export const DishesData = [
       "Polenta fingers, veal cheek, magic chili cured lemon cream, yellow laksa",
     tags: ["spicy", "vegetarian"],
     restaurant: "6745f3ea965ba597781b838d",
-    __v: 0,
     img: "https://res.cloudinary.com/dl0qa9k1r/image/upload/v1732806811/hkhxxsblav7xsspm9yx3.svg",
   },
   {
@@ -198,7 +196,6 @@ export const DishesData = [
     ingredients: "Basil dough, cashew butter, demi-glace, bison & radish",
     tags: ["spicy"],
     restaurant: "6745f3ea965ba597781b838d",
-    __v: 0,
     img: "https://res.cloudinary.com/dl0qa9k1r/image/upload/v1732806825/bi19w52xuvw4qwncrocu.svg",
   },
   {
@@ -208,6 +205,5 @@ export const DishesData = [
     ingredients: "A classic Italian pasta dish.",
     tags: ["spicy", "vegan"],
     restaurant: "67472c8ab5f3bae62426d4cb",
-    __v: 0,
   },
 ];
