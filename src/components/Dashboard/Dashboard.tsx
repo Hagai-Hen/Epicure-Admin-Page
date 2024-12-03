@@ -53,6 +53,9 @@ export const Dashboard = ({
   const [editedRowData, setEditedRowData] = useState<RowData | any>({});
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [newRowData, setNewRowData] = useState<any>({}); 
+
   const paginationModel = { page: 0, pageSize: 5 };
 
   const navigate = useNavigate();
@@ -61,6 +64,31 @@ export const Dashboard = ({
     setActivePage(pageName);
     setRowsData(data);
   }, [pageName]);
+
+  const handleCreateDialogOpen = () => {
+    setOpenCreateDialog(true);
+  };
+
+  const handleCreateDialogClose = () => {
+    setOpenCreateDialog(false);
+  };
+
+  const handleCreateFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewRowData((prev: any) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveCreate = () => {
+    const newRow = { id: `${rowsData.length + 1}`, ...newRowData };
+    setRowsData([...rowsData, newRow]);
+    setNewRowData({});
+    setOpenCreateDialog(false);
+  };
+
+  const handleCancelCreate = () => {
+    setNewRowData({});
+    setOpenCreateDialog(false);
+  };
 
   const handleDelete = (id: string) => {
     const row = rowsData.find((row) => row.id === id);
@@ -121,8 +149,6 @@ export const Dashboard = ({
     return col;
   });
 
-
-
   const handleBackClick = () => {
     navigate(-1);
   };
@@ -144,7 +170,7 @@ export const Dashboard = ({
           </DashboardHeaderEntries>
           </DashboardLeftHeader>
           <DashboardRightHeader>
-            <DashboardCreateButton>{DASHBOARD.HEADER.CREATE_BUTTON}</DashboardCreateButton>
+            <DashboardCreateButton  onClick={handleCreateDialogOpen}>{DASHBOARD.HEADER.CREATE_BUTTON}</DashboardCreateButton>
           </DashboardRightHeader>
         </DashboardHeaderContainer>
         <Paper sx={{ height: "50%", width: "90%" }}>
@@ -158,6 +184,38 @@ export const Dashboard = ({
           />
         </Paper>
       </DashboardContainer>
+
+      <Dialog open={openCreateDialog} onClose={handleCancelCreate}>
+        <DialogTitle>{DASHBOARD.CREATE_DIALOG.TITLE}</DialogTitle>
+        <DialogContent>
+          {columnData?.map((col: any) => {
+            const { field, headerName, type } = col;
+            if (field === "actions") return null;
+            const value = newRowData[field] || "";
+
+            return (
+              <TextField
+                key={field}
+                label={headerName}
+                name={field}
+                type={type || "text"}
+                value={value}
+                onChange={handleCreateFieldChange}
+                fullWidth
+                margin="normal"
+              />
+            );
+          })}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelCreate} color="primary">
+            {DASHBOARD.CREATE_DIALOG.CANCEL}
+          </Button>
+          <Button onClick={handleSaveCreate} color="primary">
+            {DASHBOARD.CREATE_DIALOG.CREATE}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={editingRow !== null} onClose={handleCancelEdit}>
         <DialogTitle>{DASHBOARD.EDIT_DIALOG.TITLE}</DialogTitle>

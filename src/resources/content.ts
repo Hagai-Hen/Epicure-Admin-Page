@@ -22,6 +22,12 @@ export const DASHBOARD = {
     ENTRIES: "entries was found",
     CREATE_BUTTON: " + Create new entry",
   },
+
+  CREATE_DIALOG: {
+    TITLE: "Create new row",
+    CANCEL: "Cancel",
+    CREATE: "Create",
+  },
 };
 
 export const RestaurantsData = [
