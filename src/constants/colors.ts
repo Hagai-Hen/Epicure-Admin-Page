@@ -7,5 +7,6 @@ export const colors = {
     borderButtonColor: '#6666ff',
     hoverButtonColor: '#fafafa',
     searchBackground: '#fafafa',
-    entriesColor:'#a0a0a0'
+    entriesColor:'#a0a0a0',
+    white: '#ffffff'
 };

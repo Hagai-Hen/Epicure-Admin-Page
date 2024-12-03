@@ -11,7 +11,7 @@ import {
   HeaderText,
   Divider,
 } from "./styles";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SIDE_BAR } from "../../resources/content";
 import { useNavigate } from "react-router-dom";
 

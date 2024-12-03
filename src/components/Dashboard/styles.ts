@@ -15,6 +15,8 @@ export const DashboardContainer = styled.div`
 export const DashboardHeaderContainer = styled.div`
   margin-top: 20px;
   width: 90%;
+  display: flex;
+  justify-content: space-between;
 `;
 
 export const DashboardBackIcon = styled(ArrowBackIcon)`
@@ -36,6 +38,7 @@ export const DashboardBackContainer = styled.div`
     cursor: pointer;
   }
   color: ${colors.borderButtonColor};
+  margin-bottom: 10px;
 `;
 
 export const DashboardHeaderTitle = styled.h1`
@@ -49,5 +52,24 @@ export const DashboardHeaderEntries = styled.h4`
   font-size: ${FONT_SIZE.SML};
   font-weight: 500;
   color: ${colors.entriesColor};
+`;
 
+export const DashboardLeftHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const DashboardRightHeader = styled.div`
+  display: flex;
+`;
+
+export const DashboardCreateButton = styled.button`
+  background-color: ${colors.borderButtonColor};
+  margin: 0;
+  margin-top: 30px;
+  padding: 5px 15px;
+  height: 35%;
+  color: ${colors.white};
+  font-size: ${FONT_SIZE.SML};
+  border-radius: 5px;
 `;

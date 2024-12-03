@@ -2,10 +2,13 @@ import {
   DashboardBackContainer,
   DashboardBackIcon,
   DashboardContainer,
+  DashboardCreateButton,
   DashboardHeaderBack,
   DashboardHeaderContainer,
   DashboardHeaderEntries,
   DashboardHeaderTitle,
+  DashboardLeftHeader,
+  DashboardRightHeader,
 } from "./styles";
 import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
@@ -128,6 +131,7 @@ export const Dashboard = ({
     <>
       <DashboardContainer>
         <DashboardHeaderContainer>
+          <DashboardLeftHeader>
           <DashboardBackContainer onClick={handleBackClick}>
             <DashboardBackIcon />
             <DashboardHeaderBack>{DASHBOARD.HEADER.BACK}</DashboardHeaderBack>
@@ -138,6 +142,10 @@ export const Dashboard = ({
           <DashboardHeaderEntries>
             {data.length} {DASHBOARD.HEADER.ENTRIES}
           </DashboardHeaderEntries>
+          </DashboardLeftHeader>
+          <DashboardRightHeader>
+            <DashboardCreateButton>{DASHBOARD.HEADER.CREATE_BUTTON}</DashboardCreateButton>
+          </DashboardRightHeader>
         </DashboardHeaderContainer>
         <Paper sx={{ height: "50%", width: "90%" }}>
           <DataGrid

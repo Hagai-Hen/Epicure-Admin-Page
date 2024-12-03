@@ -19,6 +19,7 @@ export const DASHBOARD = {
     },
     HEADER: {
         BACK: 'Back',
-        ENTRIES: 'entries was found'
-    }
+        ENTRIES: 'entries was found',
+        CREATE_BUTTON: ' + Create new entry',
+    },
 }
