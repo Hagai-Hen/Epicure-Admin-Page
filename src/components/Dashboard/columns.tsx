@@ -21,10 +21,27 @@ export const renderActionsCell = (params: any) => {
   );
 };
 
+export const renderImgCell = (params: any) => {
+  return (
+    <>
+      <img
+        src={params.value}
+        alt="Restaurant Image"
+        style={{ width: "100%", height: "auto", borderRadius: "8px" }}
+      />
+    </>
+  );
+};
+
 export const RestaurantColumns = [
   { field: "id", headerName: "ID", width: 70 },
   { field: "name", headerName: "Name", width: 130 },
-  { field: "img", headerName: "Image", width: 130 },
+  {
+    field: "img",
+    headerName: "Image",
+    width: 130,
+    renderCell: renderImgCell,
+  },
   {
     field: "chef_name",
     headerName: "Chef Name",
@@ -44,14 +61,19 @@ export const RestaurantColumns = [
     field: "actions",
     headerName: "Actions",
     width: 100,
-    renderCell: renderActionsCell, // Use the renderActionsCell function here
+    renderCell: renderActionsCell,
   },
 ];
 
 export const ChefColumns = [
   { field: "id", headerName: "ID", width: 70 },
   { field: "name", headerName: "Name", width: 130 },
-  { field: "img", headerName: "Image", width: 130 },
+  {
+    field: "img",
+    headerName: "Image",
+    width: 130,
+    renderCell: renderImgCell,
+  },
   {
     field: "description",
     headerName: "Description",
@@ -66,14 +88,19 @@ export const ChefColumns = [
     field: "actions",
     headerName: "Actions",
     width: 100,
-    renderCell: renderActionsCell, // Use the renderActionsCell function here
+    renderCell: renderActionsCell,
   },
 ];
 
 export const DishColumns = [
   { field: "id", headerName: "ID", width: 70 },
   { field: "name", headerName: "Name", width: 130 },
-  { field: "img", headerName: "Image", width: 130 },
+  {
+    field: "img",
+    headerName: "Image",
+    width: 130,
+    renderCell: renderImgCell,
+  },
   {
     field: "price",
     headerName: "Price",
@@ -98,6 +125,6 @@ export const DishColumns = [
     field: "actions",
     headerName: "Actions",
     width: 100,
-    renderCell: renderActionsCell, // Use the renderActionsCell function here
+    renderCell: renderActionsCell,
   },
 ];
