@@ -8,7 +8,13 @@ import {
   DishColumns,
 } from "./components/Dashboard/columns";
 import { AppContainer } from "./styles.ts";
-import { SIDE_BAR, DishesData, RestaurantsData, ChefsData } from "./resources/content.ts";
+import {
+  SIDE_BAR,
+  DishesData,
+  RestaurantsData,
+  ChefsData,
+} from "./resources/content.ts";
+import { PAGE_NAMES, ROUTES } from "./constants/routes.ts";
 
 function App() {
   const [activePage, setActivePage] = useState<string>("");
@@ -20,37 +26,37 @@ function App() {
         setActivePage={setActivePage}
       />
       <Routes>
-        <Route path="/" element={<h1>home page</h1>} />
+        <Route path={`${ROUTES.HOME_PAGE}`} element={<h1>home page</h1>} />
         <Route
-          path="/restaurants"
+          path={`${ROUTES.RESTAURANTS}`}
           element={
             <Dashboard
               data={RestaurantsData}
               columnData={RestaurantColumns}
               setActivePage={setActivePage}
-              pageName="restaurants"
+              pageName={`${PAGE_NAMES.RESTAURANTS}`}
             />
           }
         />
         <Route
-          path="/chefs"
+          path={`${ROUTES.CHEFS}`}
           element={
             <Dashboard
               data={ChefsData}
               columnData={ChefColumns}
               setActivePage={setActivePage}
-              pageName="chefs"
+              pageName={`${PAGE_NAMES.CHEFS}`}
             />
           }
         />
         <Route
-          path="/dishes"
+          path={`${ROUTES.DISHES}`}
           element={
             <Dashboard
               data={DishesData}
               columnData={DishColumns}
               setActivePage={setActivePage}
-              pageName="dishes"
+              pageName={`${PAGE_NAMES.DISHES}`}
             />
           }
         />
