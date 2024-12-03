@@ -1,34 +1,20 @@
-import {
-  CustomPaper,
-  DashboardBackContainer,
-  DashboardBackIcon,
-  DashboardContainer,
-  DashboardCreateButton,
-  DashboardHeaderBack,
-  DashboardHeaderContainer,
-  DashboardHeaderEntries,
-  DashboardHeaderTitle,
-  DashboardLeftHeader,
-  DashboardRightHeader,
-} from "./styles";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
-import {
-  TextField,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
 import { renderActionsCell } from "./columns";
 import { DASHBOARD } from "../../resources/content";
+import CreateDialog from "../Dialogs/CreateDialog";
+import EditDialog from "../Dialogs/EditDialog";
+import DeleteDialog from "../Dialogs/DeleteDialog";
 import { GridColDef } from "@mui/x-data-grid";
-import { useNavigate, useParams } from "react-router-dom";
+import { CustomPaper, DashboardContainer, DashboardCreateButton, DashboardHeaderContainer, DashboardLeftHeader, DashboardRightHeader, DashboardHeaderTitle, DashboardBackContainer, DashboardBackIcon, DashboardHeaderBack, DashboardHeaderEntries } from "./styles";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
+}
+
+interface RowData {
+  id: string;
 }
 
 interface SideBarProps {
@@ -37,39 +23,29 @@ interface SideBarProps {
   columnData: Column[];
 }
 
-interface RowData {
-  id: string;
-}
-
-export const Dashboard = ({
-  data,
-  setActivePage,
-  columnData,
-}: SideBarProps) => {
+export const Dashboard: React.FC<SideBarProps> = ({ data, setActivePage, columnData }) => {
   const [rowsData, setRowsData] = useState<RowData[]>(data);
   const [editingRow, setEditingRow] = useState<RowData | null>(null);
   const [editedRowData, setEditedRowData] = useState<RowData | any>({});
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [isEditFormValid, setIsEditFormValid] = useState(true);
+  const [isFormValid, setIsFormValid] = useState(false); 
+  const [isEditFormValid, setIsEditFormValid] = useState(true); 
   const paginationModel = { page: 0, pageSize: 5 };
   const navigate = useNavigate();
 
   const { collection } = useParams<{ collection: string }>();
   let displayName = "";
-  if (collection)
-    displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
+  if (collection) displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
 
   const newRowDataInitial = useMemo(() => {
     return columnData.reduce((acc: any, col: Column) => {
-      if (col.field !== "actions") {
-        acc[col.field] = "";
-      }
+      if (col.field !== "actions") acc[col.field] = "";
       return acc;
     }, {});
   }, [columnData]);
+
   const [newRowData, setNewRowData] = useState<any>(newRowDataInitial);
 
   useEffect(() => {
@@ -81,17 +57,13 @@ export const Dashboard = ({
     setOpenCreateDialog(true);
   }, []);
 
-  const handleCreateFieldChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      const updatedRowData = { ...newRowData, [name]: value };
-      setNewRowData(updatedRowData);
-
-      const isValid = Object.values(updatedRowData).every((val) => val !== "");
-      setIsFormValid(isValid);
-    },
-    [newRowData]
-  );
+  const handleCreateFieldChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const updatedRowData = { ...newRowData, [name]: value };
+    setNewRowData(updatedRowData);
+    const isValid = Object.values(updatedRowData).every((val) => val !== "");
+    setIsFormValid(isValid);
+  }, [newRowData]);
 
   const handleSaveCreate = useCallback(() => {
     const newRow = { id: `${rowsData.length + 1}`, ...newRowData };
@@ -106,14 +78,11 @@ export const Dashboard = ({
     setIsFormValid(false);
   }, []);
 
-  const handleDelete = useCallback(
-    (id: string) => {
-      const row = rowsData.find((row) => row.id === id);
-      if (row) setRowToDelete(row);
-      setOpenDeleteDialog(true);
-    },
-    [rowsData]
-  );
+  const handleDelete = useCallback((id: string) => {
+    const row = rowsData.find((row) => row.id === id);
+    if (row) setRowToDelete(row);
+    setOpenDeleteDialog(true);
+  }, [rowsData]);
 
   const confirmDelete = useCallback(() => {
     if (rowToDelete) {
@@ -135,19 +104,15 @@ export const Dashboard = ({
     setEditedRowData({ ...row });
   }, []);
 
-  const handleFieldChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      setEditedRowData((prev: any) => {
-        const updated = { ...prev, [name]: value };
-
-        const isValid = Object.values(updated).every((val) => val !== "");
-        setIsEditFormValid(isValid);
-        return updated;
-      });
-    },
-    []
-  );
+  const handleFieldChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditedRowData((prev: any) => {
+      const updated = { ...prev, [name]: value };
+      const isValid = Object.values(updated).every((val) => val !== "");
+      setIsEditFormValid(isValid);
+      return updated;
+    });
+  }, []);
 
   const handleSaveEdit = useCallback(() => {
     const updatedRows = rowsData.map((row) =>
@@ -169,8 +134,7 @@ export const Dashboard = ({
     if (col.field === "actions") {
       return {
         ...col,
-        renderCell: (params: any) =>
-          renderActionsCell({ ...params, api: { gridOptions } }),
+        renderCell: (params: any) => renderActionsCell({ ...params, api: { gridOptions } }),
       };
     }
     return col;
@@ -212,95 +176,31 @@ export const Dashboard = ({
         </CustomPaper>
       </DashboardContainer>
 
-      {/* Create Dialog */}
-      <Dialog open={openCreateDialog} onClose={handleCancelCreate}>
-        <DialogTitle>{DASHBOARD.CREATE_DIALOG.TITLE}</DialogTitle>
-        <DialogContent>
-          {columnData?.map((col: any) => {
-            const { field, headerName, type } = col;
-            if (field === "actions") return null;
-            const value = newRowData[field] || "";
+      <CreateDialog
+        open={openCreateDialog}
+        newRowData={newRowData}
+        columnData={columnData}
+        isFormValid={isFormValid}
+        onFieldChange={handleCreateFieldChange}
+        onSave={handleSaveCreate}
+        onCancel={handleCancelCreate}
+      />
 
-            return (
-              <TextField
-                key={field}
-                label={headerName}
-                name={field}
-                type={type || "text"}
-                value={value}
-                onChange={handleCreateFieldChange}
-                fullWidth
-                margin="normal"
-              />
-            );
-          })}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelCreate} color="primary">
-            {DASHBOARD.CREATE_DIALOG.CANCEL}
-          </Button>
-          <Button
-            onClick={handleSaveCreate}
-            color="primary"
-            disabled={!isFormValid}
-          >
-            {DASHBOARD.CREATE_DIALOG.CREATE}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <EditDialog
+        open={editingRow !== null}
+        editedRowData={editedRowData}
+        columnData={columnData}
+        isFormValid={isEditFormValid}
+        onFieldChange={handleFieldChange}
+        onSave={handleSaveEdit}
+        onCancel={handleCancelEdit}
+      />
 
-      {/* Edit Dialog */}
-      <Dialog open={editingRow !== null} onClose={handleCancelEdit}>
-        <DialogTitle>{DASHBOARD.EDIT_DIALOG.TITLE}</DialogTitle>
-        <DialogContent>
-          {columnData?.map((col: any) => {
-            const { field, headerName, type } = col;
-            if (field === "actions") return null;
-            const value = editedRowData[field] || "";
-
-            return (
-              <TextField
-                key={field}
-                label={headerName}
-                name={field}
-                type={type || "text"}
-                value={value}
-                onChange={handleFieldChange}
-                fullWidth
-                margin="normal"
-              />
-            );
-          })}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelEdit} color="primary">
-            {DASHBOARD.EDIT_DIALOG.CANCEL}
-          </Button>
-          <Button
-            onClick={handleSaveEdit}
-            color="primary"
-            disabled={!isEditFormValid}
-          >
-            {DASHBOARD.EDIT_DIALOG.SAVE}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Delete Dialog */}
-      <Dialog open={openDeleteDialog} onClose={cancelDelete}>
-        <DialogTitle>{DASHBOARD.DELETE_DIALOG.TITLE}</DialogTitle>
-        <DialogContent>
-          <p>{DASHBOARD.DELETE_DIALOG.BODY}</p>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={cancelDelete} color="primary">
-            {DASHBOARD.DELETE_DIALOG.CANCEL}
-          </Button>
-          <Button onClick={confirmDelete} color="secondary" variant="contained">
-            {DASHBOARD.DELETE_DIALOG.DELETE}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteDialog
+        open={openDeleteDialog}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </>
   );
 };
