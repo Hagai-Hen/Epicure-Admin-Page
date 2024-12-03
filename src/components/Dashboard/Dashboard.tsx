@@ -26,7 +26,6 @@ import { DASHBOARD } from "../../resources/content";
 import { GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 
-
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
 }
@@ -54,7 +53,9 @@ export const Dashboard = ({
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
-  const [newRowData, setNewRowData] = useState<any>({}); 
+  const [newRowData, setNewRowData] = useState<any>({});
+  const [isFormValid, setIsFormValid] = useState(false); 
+  const [isEditFormValid, setIsEditFormValid] = useState(true); 
 
   const paginationModel = { page: 0, pageSize: 5 };
 
@@ -64,6 +65,16 @@ export const Dashboard = ({
     setActivePage(pageName);
     setRowsData(data);
   }, [pageName]);
+
+  useEffect(() => {
+    const initialRowData = columnData.reduce((acc: any, col: Column) => {
+      if (col.field !== "actions") {
+        acc[col.field] = ""; 
+      }
+      return acc;
+    }, {});
+    setNewRowData(initialRowData);
+  }, [columnData]);
 
   const handleCreateDialogOpen = () => {
     setOpenCreateDialog(true);
@@ -75,7 +86,11 @@ export const Dashboard = ({
 
   const handleCreateFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewRowData((prev: any) => ({ ...prev, [name]: value }));
+    const updatedRowData = { ...newRowData, [name]: value };
+    setNewRowData(updatedRowData);
+
+    const isValid = Object.values(updatedRowData).every((val) => val !== "");
+    setIsFormValid(isValid); 
   };
 
   const handleSaveCreate = () => {
@@ -88,6 +103,7 @@ export const Dashboard = ({
   const handleCancelCreate = () => {
     setNewRowData({});
     setOpenCreateDialog(false);
+    setIsFormValid(false);
   };
 
   const handleDelete = (id: string) => {
@@ -118,7 +134,13 @@ export const Dashboard = ({
 
   const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setEditedRowData((prev: any) => ({ ...prev, [name]: value }));
+    setEditedRowData((prev: any) => {
+      const updated = { ...prev, [name]: value };
+
+      const isValid = Object.values(updated).every((val) => val !== "");
+      setIsEditFormValid(isValid); 
+      return updated;
+    });
   };
 
   const handleSaveEdit = () => {
@@ -158,19 +180,21 @@ export const Dashboard = ({
       <DashboardContainer>
         <DashboardHeaderContainer>
           <DashboardLeftHeader>
-          <DashboardBackContainer onClick={handleBackClick}>
-            <DashboardBackIcon />
-            <DashboardHeaderBack>{DASHBOARD.HEADER.BACK}</DashboardHeaderBack>
-          </DashboardBackContainer>
-          <DashboardHeaderTitle>
-            {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
-          </DashboardHeaderTitle>
-          <DashboardHeaderEntries>
-            {data.length} {DASHBOARD.HEADER.ENTRIES}
-          </DashboardHeaderEntries>
+            <DashboardBackContainer onClick={handleBackClick}>
+              <DashboardBackIcon />
+              <DashboardHeaderBack>{DASHBOARD.HEADER.BACK}</DashboardHeaderBack>
+            </DashboardBackContainer>
+            <DashboardHeaderTitle>
+              {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
+            </DashboardHeaderTitle>
+            <DashboardHeaderEntries>
+              {data.length} {DASHBOARD.HEADER.ENTRIES}
+            </DashboardHeaderEntries>
           </DashboardLeftHeader>
           <DashboardRightHeader>
-            <DashboardCreateButton  onClick={handleCreateDialogOpen}>{DASHBOARD.HEADER.CREATE_BUTTON}</DashboardCreateButton>
+            <DashboardCreateButton onClick={handleCreateDialogOpen}>
+              {DASHBOARD.HEADER.CREATE_BUTTON}
+            </DashboardCreateButton>
           </DashboardRightHeader>
         </DashboardHeaderContainer>
         <Paper sx={{ height: "50%", width: "90%" }}>
@@ -185,12 +209,13 @@ export const Dashboard = ({
         </Paper>
       </DashboardContainer>
 
+      {/* Create Dialog */}
       <Dialog open={openCreateDialog} onClose={handleCancelCreate}>
         <DialogTitle>{DASHBOARD.CREATE_DIALOG.TITLE}</DialogTitle>
         <DialogContent>
           {columnData?.map((col: any) => {
             const { field, headerName, type } = col;
-            if (field === "actions") return null;
+            if (field === "actions") return null; 
             const value = newRowData[field] || "";
 
             return (
@@ -211,18 +236,23 @@ export const Dashboard = ({
           <Button onClick={handleCancelCreate} color="primary">
             {DASHBOARD.CREATE_DIALOG.CANCEL}
           </Button>
-          <Button onClick={handleSaveCreate} color="primary">
+          <Button
+            onClick={handleSaveCreate}
+            color="primary"
+            disabled={!isFormValid} 
+          >
             {DASHBOARD.CREATE_DIALOG.CREATE}
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Edit Dialog */}
       <Dialog open={editingRow !== null} onClose={handleCancelEdit}>
         <DialogTitle>{DASHBOARD.EDIT_DIALOG.TITLE}</DialogTitle>
         <DialogContent>
           {columnData?.map((col: any) => {
             const { field, headerName, type } = col;
-            if (field === "actions") return null;
+            if (field === "actions") return null; 
             const value = editedRowData[field] || "";
 
             return (
@@ -243,12 +273,17 @@ export const Dashboard = ({
           <Button onClick={handleCancelEdit} color="primary">
             {DASHBOARD.EDIT_DIALOG.CANCEL}
           </Button>
-          <Button onClick={handleSaveEdit} color="primary">
+          <Button
+            onClick={handleSaveEdit}
+            color="primary"
+            disabled={!isEditFormValid} 
+          >
             {DASHBOARD.EDIT_DIALOG.SAVE}
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Delete Dialog */}
       <Dialog open={openDeleteDialog} onClose={cancelDelete}>
         <DialogTitle>{DASHBOARD.DELETE_DIALOG.TITLE}</DialogTitle>
         <DialogContent>
