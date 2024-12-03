@@ -24,7 +24,7 @@ import {
 import { renderActionsCell } from "./columns";
 import { DASHBOARD } from "../../resources/content";
 import { GridColDef } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
@@ -34,7 +34,6 @@ interface SideBarProps {
   data: RowData[];
   setActivePage: (page: string) => void;
   columnData: Column[];
-  pageName: string;
 }
 
 interface RowData {
@@ -45,7 +44,6 @@ export const Dashboard = ({
   data,
   setActivePage,
   columnData,
-  pageName,
 }: SideBarProps) => {
   const [rowsData, setRowsData] = useState<RowData[]>(data);
   const [editingRow, setEditingRow] = useState<RowData | null>(null);
@@ -54,22 +52,24 @@ export const Dashboard = ({
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [newRowData, setNewRowData] = useState<any>({});
-  const [isFormValid, setIsFormValid] = useState(false); 
-  const [isEditFormValid, setIsEditFormValid] = useState(true); 
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [isEditFormValid, setIsEditFormValid] = useState(true);
 
   const paginationModel = { page: 0, pageSize: 5 };
+
+  const { collection } = useParams<{ collection: string }>();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    setActivePage(pageName);
+    setActivePage(collection || "");
     setRowsData(data);
-  }, [pageName]);
+  }, [collection]);
 
   useEffect(() => {
     const initialRowData = columnData.reduce((acc: any, col: Column) => {
       if (col.field !== "actions") {
-        acc[col.field] = ""; 
+        acc[col.field] = "";
       }
       return acc;
     }, {});
@@ -80,17 +80,13 @@ export const Dashboard = ({
     setOpenCreateDialog(true);
   };
 
-  const handleCreateDialogClose = () => {
-    setOpenCreateDialog(false);
-  };
-
   const handleCreateFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const updatedRowData = { ...newRowData, [name]: value };
     setNewRowData(updatedRowData);
 
     const isValid = Object.values(updatedRowData).every((val) => val !== "");
-    setIsFormValid(isValid); 
+    setIsFormValid(isValid);
   };
 
   const handleSaveCreate = () => {
@@ -138,7 +134,7 @@ export const Dashboard = ({
       const updated = { ...prev, [name]: value };
 
       const isValid = Object.values(updated).every((val) => val !== "");
-      setIsEditFormValid(isValid); 
+      setIsEditFormValid(isValid);
       return updated;
     });
   };
@@ -174,6 +170,9 @@ export const Dashboard = ({
   const handleBackClick = () => {
     navigate(-1);
   };
+  let displayName = "";
+  if (collection)
+    displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
 
   return (
     <>
@@ -184,9 +183,7 @@ export const Dashboard = ({
               <DashboardBackIcon />
               <DashboardHeaderBack>{DASHBOARD.HEADER.BACK}</DashboardHeaderBack>
             </DashboardBackContainer>
-            <DashboardHeaderTitle>
-              {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
-            </DashboardHeaderTitle>
+            <DashboardHeaderTitle>{displayName}</DashboardHeaderTitle>
             <DashboardHeaderEntries>
               {data.length} {DASHBOARD.HEADER.ENTRIES}
             </DashboardHeaderEntries>
@@ -215,7 +212,7 @@ export const Dashboard = ({
         <DialogContent>
           {columnData?.map((col: any) => {
             const { field, headerName, type } = col;
-            if (field === "actions") return null; 
+            if (field === "actions") return null;
             const value = newRowData[field] || "";
 
             return (
@@ -239,7 +236,7 @@ export const Dashboard = ({
           <Button
             onClick={handleSaveCreate}
             color="primary"
-            disabled={!isFormValid} 
+            disabled={!isFormValid}
           >
             {DASHBOARD.CREATE_DIALOG.CREATE}
           </Button>
@@ -252,7 +249,7 @@ export const Dashboard = ({
         <DialogContent>
           {columnData?.map((col: any) => {
             const { field, headerName, type } = col;
-            if (field === "actions") return null; 
+            if (field === "actions") return null;
             const value = editedRowData[field] || "";
 
             return (
@@ -276,7 +273,7 @@ export const Dashboard = ({
           <Button
             onClick={handleSaveEdit}
             color="primary"
-            disabled={!isEditFormValid} 
+            disabled={!isEditFormValid}
           >
             {DASHBOARD.EDIT_DIALOG.SAVE}
           </Button>
