@@ -79,3 +79,9 @@ export const CustomPaper = styled(Paper)`
   height: 50%;
   width: 90%;
 `;
+
+export const TableImg = styled.img`
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+`;

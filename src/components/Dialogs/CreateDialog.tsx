@@ -1,5 +1,12 @@
-import React from "react";
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from "@mui/material";
+import React, { useEffect, useMemo } from "react";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Button,
+} from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
 
 interface CreateDialogProps {
@@ -10,9 +17,34 @@ interface CreateDialogProps {
   onFieldChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSave: () => void;
   onCancel: () => void;
+  setNewRowData: (row: string) => void;
 }
 
-const CreateDialog: React.FC<CreateDialogProps> = ({ open, newRowData, columnData, isFormValid, onFieldChange, onSave, onCancel }) => {
+const CreateDialog: React.FC<CreateDialogProps> = ({
+  open,
+  newRowData,
+  columnData,
+  isFormValid,
+  onFieldChange,
+  onSave,
+  onCancel,
+  setNewRowData,
+}) => {
+  const initializedRowData = useMemo(() => {
+    if (!open) return {};
+
+    return columnData?.reduce((acc: any, col: any) => {
+      if (col.field !== "actions") {
+        acc[col.field] = "";
+      }
+      return acc;
+    }, {});
+  }, [open, columnData]);
+
+  useEffect(() => {
+    setNewRowData(initializedRowData);
+  }, [initializedRowData]);
+
   return (
     <Dialog open={open} onClose={onCancel}>
       <DialogTitle>{DASHBOARD.CREATE_DIALOG.TITLE}</DialogTitle>

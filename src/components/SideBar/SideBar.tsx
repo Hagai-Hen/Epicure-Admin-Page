@@ -11,7 +11,7 @@ import {
   HeaderText,
   Divider,
 } from "./styles";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { SIDE_BAR } from "../../resources/content";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
@@ -34,16 +34,16 @@ export const SideBar = ({
     setActivePage(currentPage.toLowerCase());
   }, [location.pathname, setActivePage]);
 
-  const handleClick = (item: string) => {
+  const handleClick = useCallback((item: string) => {
     navigate(`${ROUTES.COLLECTIONS}/${item}`);
     setActivePage(item);
-  };
+  }, [navigate, setActivePage]);
   return (
     <>
       <SideBarContainer>
         <SideBarHeader>
           <HeaderText>{SIDE_BAR.HEADER_TITLE}</HeaderText>
-          <CustomSearchIcon sx={{ fontSize: 20 }} />
+          <CustomSearchIcon />
         </SideBarHeader>
         <Divider />
         <SideBarTitleContainer>
@@ -60,7 +60,6 @@ export const SideBar = ({
           >
             <SmallCircleIcon
               isActive={item === activePage}
-              sx={{ fontSize: 6 }}
             />
             <SideBarCollection isActive={item === activePage}>
               {item}

@@ -1,8 +1,21 @@
 import { IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { TableImg } from "./styles";
 
-export const renderActionsCell = (params: any) => {
+interface ParamsInterface {
+  value: string;
+  api: {
+    gridOptions: {
+      handleEdit: (s: string) => void;
+      handleDelete: (s: string) => void;
+    };
+  };
+  row: string;
+  id: string;
+}
+
+export const renderActionsCell = (params: ParamsInterface) => {
   return (
     <>
       <IconButton
@@ -21,16 +34,8 @@ export const renderActionsCell = (params: any) => {
   );
 };
 
-export const renderImgCell = (params: any) => {
-  return (
-    <>
-      <img
-        src={params.value}
-        alt="Restaurant Image"
-        style={{ width: "100%", height: "auto", borderRadius: "8px" }}
-      />
-    </>
-  );
+export const renderImgCell = (params: ParamsInterface) => {
+  return <TableImg src={params.value} />;
 };
 
 export const RestaurantColumns = [

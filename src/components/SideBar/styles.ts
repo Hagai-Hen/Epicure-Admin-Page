@@ -32,6 +32,8 @@ export const CustomSearchIcon = styled(SearchIcon)`
   border-radius: 5px;
   padding: 5px;
   border: 1px solid ${colors.buttonBackgroundColor};
+  max-height: 20px;
+  max-width: 20px;
 `;
 
 export const Divider = styled.div`
@@ -90,4 +92,6 @@ export const SmallCircleIcon = styled(CircleIcon)<SideBarItemProps>`
   color: ${(props) =>
     props.isActive ? `${colors.borderButtonColor}` : `${colors.textColor}`};
   margin-right: 10px;
+  max-height: 6px;
+  max-width: 6px;
 `;

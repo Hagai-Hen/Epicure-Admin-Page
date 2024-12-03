@@ -184,6 +184,7 @@ export const Dashboard: React.FC<SideBarProps> = ({ data, setActivePage, columnD
         onFieldChange={handleCreateFieldChange}
         onSave={handleSaveCreate}
         onCancel={handleCancelCreate}
+        setNewRowData={setNewRowData}
       />
 
       <EditDialog
