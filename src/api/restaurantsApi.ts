@@ -1,4 +1,5 @@
 import { RestaurantInterface } from "../constants/interfaces";
+import { getDishName } from "./dishesApi";
 
 export const fetchRestaurants = async () => {
   try {
@@ -7,9 +8,24 @@ export const fetchRestaurants = async () => {
     if (data.error) {
       throw new Error(data.error);
     }
-    const transformedData = data.map((restaurant: RestaurantInterface) => {
-      return { ...restaurant, id: restaurant._id, _id: undefined };
-    });
+    const transformedData = await Promise.all(
+      data.map(async (restaurant: RestaurantInterface) => {
+        const dishNamesForRestaurant = await Promise.all(
+          restaurant.dishes.map(async (dishId: string) => {
+            const dishName = await getDishName(dishId);
+            return dishName;
+          })
+        );
+
+        return {
+          ...restaurant,
+          dishes: dishNamesForRestaurant,
+          id: restaurant._id,
+          _id: undefined,
+        };
+      })
+    );
+
     return transformedData;
   } catch (error) {
     console.log("Error getting restaurants:", (error as Error).message);

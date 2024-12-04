@@ -16,6 +16,20 @@ export const fetchDishes = async () => {
   }
 };
 
+export const getDishName = async (id: string) => {
+  try {
+    const response = await fetch(`/api/dishes/get/${id}`);
+    const data = await response.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    console.log(data.name)
+    return data.name;
+  } catch (error) {
+    console.log("Error getting dish name:", (error as Error).message);
+  }
+};
+
 export const createDish = async (dishData: DishInterface) => {
   try {
     if (dishData.tags && !Array.isArray(dishData.tags)) {
@@ -82,3 +96,5 @@ export const updateDish = async (dishData: DishInterface) => {
     console.error("Error updating dish:", error);
   }
 };
+
+
