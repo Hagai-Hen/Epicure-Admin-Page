@@ -34,7 +34,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
     if (!open) return {};
 
     return columnData?.reduce((acc: any, col: any) => {
-      if (col.field !== "actions") {
+      if (col.field !== "actions" && col.field !== "id" && col.field !== "chef_name") {
         acc[col.field] = "";
       }
       return acc;
@@ -51,7 +51,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
       <DialogContent>
         {columnData?.map((col: any) => {
           const { field, headerName, type } = col;
-          if (field === "actions") return null;
+          if (field === "actions" || field === "id" || field === "chef_name") return null;
           const value = newRowData[field] || "";
 
           return (

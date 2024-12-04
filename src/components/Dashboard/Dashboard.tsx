@@ -61,7 +61,6 @@ export const Dashboard = ({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEditFormValid, setIsEditFormValid] = useState(true);
 
-
   const paginationModel = { page: 0, pageSize: 5 };
 
   const newRowDataInitial = useMemo(() => {
@@ -81,7 +80,8 @@ export const Dashboard = ({
   useEffect(() => {
     setActivePage(collection || "");
     setRowsData(data);
-  }, [collection]);
+    console.log("2", rowsData);
+  }, [collection, data]);
 
   const handleCreateDialogOpen = useCallback(() => {
     setOpenCreateDialog(true);
@@ -98,9 +98,10 @@ export const Dashboard = ({
   );
 
   const handleSaveCreate = useCallback(() => {
-    const newRow = { id: `${data.length + 1}`, ...newRowData };
+    const newRow = { id: `${rowsData.length + 1}`, ...newRowData };
     dispatch(actions.createAction(newRow));
     setRowsData((prevRows) => [...prevRows, newRow]);
+    console.log("3", rowsData);
     setNewRowData({});
     setOpenCreateDialog(false);
   }, [rowsData, newRowData]);
@@ -123,6 +124,11 @@ export const Dashboard = ({
   const confirmDelete = useCallback(() => {
     if (rowToDelete) {
       dispatch(actions.deleteAction(rowToDelete.id));
+      setRowsData((prevRows) =>
+        prevRows.filter((row) => row.id !== rowToDelete.id)
+      );
+
+      console.log("1", rowsData);
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
@@ -195,7 +201,7 @@ export const Dashboard = ({
             </DashboardBackContainer>
             <DashboardHeaderTitle>{displayName}</DashboardHeaderTitle>
             <DashboardHeaderEntries>
-              {data.length} {DASHBOARD.HEADER.ENTRIES}
+              {rowsData.length} {DASHBOARD.HEADER.ENTRIES}
             </DashboardHeaderEntries>
           </DashboardLeftHeader>
           <DashboardRightHeader>
@@ -206,7 +212,7 @@ export const Dashboard = ({
         </DashboardHeaderContainer>
         <CustomPaper>
           <DataGrid
-            rows={data}
+            rows={rowsData}
             columns={updatedColumns}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[5, 10]}

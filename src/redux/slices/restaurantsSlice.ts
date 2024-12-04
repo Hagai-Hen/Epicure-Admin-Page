@@ -1,5 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchRestaurants } from "../../api/fetchRestaurants";
+import {
+  createRestaurant,
+  fetchRestaurants,
+  deleteRestaurant,
+  updateRestaurant,
+} from "../../api/fetchRestaurants";
 
 interface Restaurant {
   id: string;
@@ -15,7 +20,7 @@ interface RestaurantsState {
 }
 
 const initialState: RestaurantsState = {
-  restaurants: [{id: ''}],
+  restaurants: [{ id: "" }],
 };
 
 const restaurantSlice = createSlice({
@@ -25,22 +30,6 @@ const restaurantSlice = createSlice({
     setRestaurants: (state, action: PayloadAction<Restaurant[]>) => {
       state.restaurants = action.payload;
     },
-    createRestaurant: (state, action: PayloadAction<Restaurant>) => {
-      state.restaurants.push(action.payload);
-    },
-    updateRestaurant: (state, action: PayloadAction<Restaurant>) => {
-      const index = state.restaurants.findIndex(
-        (restaurant) => restaurant.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.restaurants[index] = action.payload;
-      }
-    },
-    deleteRestaurant: (state, action: PayloadAction<string>) => {
-      state.restaurants = state.restaurants.filter(
-        (restaurant) => restaurant.id !== action.payload
-      );
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -48,8 +37,36 @@ const restaurantSlice = createSlice({
         console.log("getRestaurants.pending");
       })
       .addCase(getRestaurants.fulfilled, (state, action) => {
-        console.log("getRestaurants.fulfilled")
+        console.log("getRestaurants.fulfilled");
         state.restaurants = action.payload;
+      })
+      .addCase(CreateRestaurant.pending, () => {
+        console.log("createRestaurants.pending");
+      })
+      .addCase(CreateRestaurant.fulfilled, (state, action) => {
+        state.restaurants.push(action.payload);
+        console.log("createRestaurants.fulfilled");
+      })
+      .addCase(DeleteRestaurant.pending, () => {
+        console.log("deleteRestaurants.pending");
+      })
+      .addCase(DeleteRestaurant.fulfilled, (state, action) => {
+        state.restaurants = state.restaurants.filter(
+          (restaurant) => restaurant.id !== action.payload.restaurant._id
+        );
+        console.log("deleteRestaurants.fulfilled");
+      })
+      .addCase(UpdateRestaurant.pending, () => {
+        console.log("updateRestaurants.pending");
+      })
+      .addCase(UpdateRestaurant.fulfilled, (state, action) => {
+        const index = state.restaurants.findIndex(
+          (restaurant) => restaurant.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.restaurants[index] = action.payload;
+        }
+        console.log("updateRestaurants.fulfilled");
       });
   },
 });
@@ -62,10 +79,29 @@ export const getRestaurants = createAsyncThunk(
   }
 );
 
-export const {
-  setRestaurants,
-  createRestaurant,
-  updateRestaurant,
-  deleteRestaurant,
-} = restaurantSlice.actions;
+export const CreateRestaurant = createAsyncThunk(
+  "restaurants/create",
+  async (restaurantData: string) => {
+    const restaurant = await createRestaurant(restaurantData);
+    return restaurant;
+  }
+);
+
+export const DeleteRestaurant = createAsyncThunk(
+  "restaurants/delete",
+  async (id: string) => {
+    const restaurant = await deleteRestaurant(id);
+    return restaurant;
+  }
+);
+
+export const UpdateRestaurant = createAsyncThunk(
+  "restaurants/update",
+  async (restaurantData) => {
+    const restaurant = await updateRestaurant(restaurantData);
+    return restaurant;
+  }
+);
+
+export const { setRestaurants } = restaurantSlice.actions;
 export default restaurantSlice.reducer;

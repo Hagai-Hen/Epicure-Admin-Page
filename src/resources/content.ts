@@ -52,8 +52,8 @@ export const COLLECTIONS_DATA = {
         renderCell: renderImgCell,
       },
       {
-        field: "chef_name",
-        headerName: "Chef Name",
+        field: "chef",
+        headerName: "Chef",
         width: 130,
       },
       {

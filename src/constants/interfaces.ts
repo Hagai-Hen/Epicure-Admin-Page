@@ -10,6 +10,7 @@ export interface DishInterface {
 
 export interface RestaurantInterface {
   _id: string;
+  id: string;
   name: string;
   img: string;
   chef: string;

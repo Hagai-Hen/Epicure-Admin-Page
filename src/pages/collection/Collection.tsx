@@ -13,10 +13,10 @@ import {
 
 import {
   setRestaurants,
-  createRestaurant,
-  updateRestaurant,
-  deleteRestaurant,
+  UpdateRestaurant,
+  DeleteRestaurant,
   getRestaurants,
+  CreateRestaurant,
 } from "../../redux/slices/restaurantsSlice";
 
 import {
@@ -38,9 +38,9 @@ const collectionToActionsMap: Record<string, any> = {
   },
   restaurants: {
     setAction: setRestaurants,
-    createAction: createRestaurant,
-    updateAction: updateRestaurant,
-    deleteAction: deleteRestaurant,
+    createAction: CreateRestaurant,
+    updateAction: UpdateRestaurant,
+    deleteAction: DeleteRestaurant,
     getAction: getRestaurants,
   },
   dishes: {
@@ -78,7 +78,7 @@ function CollectionPage({
 
   useEffect(() => {
     dispatch(actions.getAction());
-  }, [collection]);
+  }, [collection, actions.deleteAction]);
 
   const data = useSelector(
     (state: any) => state[collection.toLowerCase()][collection.toLowerCase()]
