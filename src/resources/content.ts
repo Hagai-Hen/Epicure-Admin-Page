@@ -12,7 +12,7 @@ export const SIDE_BAR = {
 
 export const DASHBOARD = {
   EDIT_DIALOG: {
-    TITLE: "Edit Row",
+    TITLE: "Edit",
     CANCEL: "Cancel",
     SAVE: "Save",
   },
@@ -29,7 +29,7 @@ export const DASHBOARD = {
   },
 
   CREATE_DIALOG: {
-    TITLE: "Create new row",
+    TITLE: "Create new",
     CANCEL: "Cancel",
     CREATE: "Create",
   },
@@ -37,11 +37,6 @@ export const DASHBOARD = {
 
 export const COLLECTIONS_DATA = {
   RESTAURANTS: {
-    data: [
-      {
-        id: "",
-      },
-    ],
     columns: [
       { field: "id", headerName: "ID", width: 70 },
       { field: "name", headerName: "Name", width: 130 },
@@ -53,6 +48,11 @@ export const COLLECTIONS_DATA = {
       },
       {
         field: "chef",
+        headerName: "Chef",
+        width: 130,
+      },
+      {
+        field: "chef_name",
         headerName: "Chef",
         width: 130,
       },

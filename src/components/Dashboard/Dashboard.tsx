@@ -161,7 +161,9 @@ export const Dashboard = ({
     navigate(-1);
   }, [navigate]);
 
-  const updatedColumns = columnData.map((col) => {
+  const updatedColumns = columnData
+  .filter((col) => col.field !== "chef")  // Remove the 'chef' column
+  .map((col) => {
     if (col.field === "actions") {
       return {
         ...col,
@@ -217,6 +219,7 @@ export const Dashboard = ({
         onSave={handleSaveCreate}
         onCancel={handleCancelCreate}
         setNewRowData={setNewRowData}
+        collection={collection}
       />
 
       <EditDialog
@@ -227,6 +230,7 @@ export const Dashboard = ({
         onFieldChange={handleFieldChange}
         onSave={handleSaveEdit}
         onCancel={handleCancelEdit}
+        collection={collection}
       />
 
       <DeleteDialog

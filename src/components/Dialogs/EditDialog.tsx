@@ -17,6 +17,7 @@ interface EditDialogProps {
   onFieldChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSave: () => void;
   onCancel: () => void;
+  collection: string | undefined;
 }
 
 const EditDialog: React.FC<EditDialogProps> = ({
@@ -27,14 +28,18 @@ const EditDialog: React.FC<EditDialogProps> = ({
   onFieldChange,
   onSave,
   onCancel,
+  collection,
 }) => {
   return (
     <Dialog open={open} onClose={onCancel}>
-      <DialogTitle>{DASHBOARD.EDIT_DIALOG.TITLE}</DialogTitle>
+      <DialogTitle>
+        {DASHBOARD.EDIT_DIALOG.TITLE} {collection?.slice(0, -1)}
+      </DialogTitle>
       <DialogContent>
         {columnData?.map((col: any) => {
           const { field, headerName, type } = col;
-          if (field === "actions" || field === "id") return null;
+          if (field === "actions" || field === "id" || field === "chef_name")
+            return null;
           const value = editedRowData[field] || "";
 
           return (

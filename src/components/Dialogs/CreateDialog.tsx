@@ -18,6 +18,7 @@ interface CreateDialogProps {
   onSave: () => void;
   onCancel: () => void;
   setNewRowData: (row: string) => void;
+  collection: string | undefined;
 }
 
 const CreateDialog: React.FC<CreateDialogProps> = ({
@@ -29,6 +30,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
   onSave,
   onCancel,
   setNewRowData,
+  collection,
 }) => {
   const initializedRowData = useMemo(() => {
     if (!open) return {};
@@ -47,7 +49,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={onCancel}>
-      <DialogTitle>{DASHBOARD.CREATE_DIALOG.TITLE}</DialogTitle>
+      <DialogTitle>{DASHBOARD.CREATE_DIALOG.TITLE} {collection?.slice(0, -1)}</DialogTitle>
       <DialogContent>
         {columnData?.map((col: any) => {
           const { field, headerName, type } = col;
