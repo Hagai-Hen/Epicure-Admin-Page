@@ -51,11 +51,11 @@ export const Dashboard = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [editingRow, setEditingRow] = useState<any | null>(null);
-  const [editedRowData, setEditedRowData] = useState<any>({});
+  const [editingRow, setEditingRow] = useState<RowData | null>(null);
+  const [editedRowData, setEditedRowData] = useState<RowData>();
   const [rowsData, setRowsData] = useState<RowData[]>(data);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [rowToDelete, setRowToDelete] = useState<any | null>(null);
+  const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEditFormValid, setIsEditFormValid] = useState(true);
@@ -102,28 +102,6 @@ export const Dashboard = ({
     setNewRowData({});
     setOpenCreateDialog(false);
   }, [rowsData, newRowData]);
-
-  // const handleSaveCreate = useCallback(() => {
-  //   const newRow = { id: `${data.length + 1}`, ...newRowData };
-  //   switch (collection) {
-  //     case "restaurants":
-  //       dispatch(createRestaurant(newRow));
-  //       break;
-  //     case "chefs":
-  //       dispatch(createChef(newRow));
-  //       break;
-  //     case "dishes":
-  //       dispatch(createDish(newRow));
-  //       break;
-  //   }
-  // }, [rowsData, newRowData]);
-
-  // const handleSaveCreate = useCallback(() => {
-  //   const newRow = { id: `${rowsData.length + 1}`, ...newRowData };
-  //   setRowsData((prevRows) => [...prevRows, newRow]);
-  //   setNewRowData({});
-  //   setOpenCreateDialog(false);
-  // }, [rowsData, newRowData]);
 
   const handleCancelCreate = useCallback(() => {
     setNewRowData({});
@@ -179,13 +157,6 @@ export const Dashboard = ({
     setRowsData(updatedRows);
     dispatch(actions.updateAction(editedRowData));
   }, [rowsData, editingRow, editedRowData]);
-  // const handleSaveEdit = useCallback(() => {
-  //   const updatedRows = rowsData.map((row) =>
-  //     row.id === editingRow?.id ? { ...row, ...editedRowData } : row
-  //   );
-  //   setRowsData(updatedRows);
-  //   setEditingRow(null);
-  // }, [rowsData, editingRow, editedRowData]);
 
   const handleCancelEdit = useCallback(() => {
     setEditingRow(null);
