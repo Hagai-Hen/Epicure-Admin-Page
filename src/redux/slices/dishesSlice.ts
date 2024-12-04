@@ -75,7 +75,7 @@ export const getDishes = createAsyncThunk("dishes/getall", async () => {
 
 export const CreateDish = createAsyncThunk(
   "dishes/create",
-  async (dishData: string) => {
+  async (dishData: DishInterface) => {
     const dish = await createDish(dishData);
     return dish;
   }

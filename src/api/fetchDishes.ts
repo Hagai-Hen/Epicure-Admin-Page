@@ -16,9 +16,7 @@ export const fetchDishes = async () => {
   }
 };
 
-export default fetchDishes;
-
-export const createDish = async (dishData) => {
+export const createDish = async (dishData: DishInterface) => {
   try {
     if (dishData.tags) {
       dishData.tags = [dishData.tags];

@@ -5,9 +5,9 @@ import { COLLECTIONS, COLLECTIONS_DATA } from "../../resources/content";
 
 import {
   setChefs,
-  createChef,
-  updateChef,
-  deleteChef,
+  CreateChef,
+  UpdateChef,
+  DeleteChef,
   getChefs,
 } from "../../redux/slices/chefsSlice";
 
@@ -31,9 +31,9 @@ import { useEffect } from "react";
 const collectionToActionsMap: Record<string, any> = {
   chefs: {
     setAction: setChefs,
-    createAction: createChef,
-    updateAction: updateChef,
-    deleteAction: deleteChef,
+    createAction: CreateChef,
+    updateAction: UpdateChef,
+    deleteAction: DeleteChef,
     getAction: getChefs,
   },
   restaurants: {

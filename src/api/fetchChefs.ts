@@ -16,4 +16,70 @@ export const fetchChefs = async () => {
   }
 };
 
-export default fetchChefs;
+export const createChef = async (chefData: ChefInterface) => {
+  try {
+    
+    const response = await fetch(`/api/chefs/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(chefData),
+    });
+    const data = await response.json();
+    if (data._id) {
+      data.id = data._id;
+      data._id = undefined;
+    }
+
+    console.log("data", data);
+
+    return data;
+  } catch (error) {
+    console.error("Error creating chef:", error);
+  }
+};
+
+export const deleteChef = async (id: string) => {
+  try {
+    const response = await fetch(`/api/chefs/delete/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    if (data._id) {
+      data.id = data._id;
+      data._id = undefined;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error deleting chef:", error);
+  }
+};
+
+export const updateChef = async (chefData: ChefInterface) => {
+  try {
+
+    const response = await fetch(`/api/chefs/update/${chefData.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(chefData),
+    });
+    const data = await response.json();
+
+    if (data._id) {
+      data.id = data._id;
+      data._id = undefined;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error updating chef:", error);
+  }
+};
+

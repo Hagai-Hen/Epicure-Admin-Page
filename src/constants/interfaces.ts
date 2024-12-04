@@ -20,6 +20,7 @@ export interface RestaurantInterface {
 
 export interface ChefInterface {
   _id: string;
+  id: string;
   name: string;
   img: string;
   description: string;
