@@ -98,9 +98,8 @@ export const Dashboard = ({
 
   const handleSaveCreate = useCallback(() => {
     dispatch(actions.createAction(newRowData));
-    // setRowsData((prevRows) => [...prevRows, newRow]);
-    // setNewRowData({});
     setOpenCreateDialog(false);
+    setIsFormValid(false);
   }, [rowsData, newRowData]);
 
   const handleCancelCreate = useCallback(() => {
@@ -121,9 +120,6 @@ export const Dashboard = ({
   const confirmDelete = useCallback(() => {
     if (rowToDelete) {
       dispatch(actions.deleteAction(rowToDelete.id));
-      // setRowsData((prevRows) =>
-      //   prevRows.filter((row) => row.id !== rowToDelete.id)
-      // );
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
@@ -154,7 +150,6 @@ export const Dashboard = ({
 
   const handleSaveEdit = useCallback(() => {
     setEditingRow(null);
-    // setRowsData(updatedRows);
     dispatch(actions.updateAction(editedRowData));
   }, [rowsData, editingRow, editedRowData]);
 

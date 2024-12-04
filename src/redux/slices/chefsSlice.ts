@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {createChef, deleteChef, fetchChefs, updateChef} from "../../api/fetchChefs";
+import { createChef, deleteChef, fetchChefs, updateChef } from "../../api/chefsApi";
 import { ChefInterface } from "../../constants/interfaces";
 
 interface Chef {
@@ -12,10 +12,14 @@ interface Chef {
 
 interface ChefsState {
   chefs: Chef[];
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: ChefsState = {
-  chefs: [{id: ''}],
+  chefs: [{ id: "" }],
+  loading: false,
+  error: null,
 };
 
 const chefsSlice = createSlice({
@@ -28,31 +32,47 @@ const chefsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getChefs.pending, () => {
-        console.log("getChefs.pending");
+      .addCase(getChefs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(getChefs.fulfilled, (state, action) => {
-        console.log("getChefs.fulfilled")
         state.chefs = action.payload;
+        state.loading = false;
       })
-      .addCase(CreateChef.pending, () => {
-        console.log("createChef.pending");
+      .addCase(getChefs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to fetch chefs";
+      })
+      .addCase(CreateChef.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(CreateChef.fulfilled, (state, action) => {
         state.chefs.push(action.payload);
-        console.log("createChef.fulfilled");
+        state.loading = false;
       })
-      .addCase(DeleteChef.pending, () => {
-        console.log("deleteChef.pending");
+      .addCase(CreateChef.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to create chef";
+      })
+      .addCase(DeleteChef.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(DeleteChef.fulfilled, (state, action) => {
         state.chefs = state.chefs.filter(
           (chef) => chef.id !== action.payload.chef._id
         );
-        console.log("deleteChef.fulfilled");
+        state.loading = false;
       })
-      .addCase(UpdateChef.pending, () => {
-        console.log("updateChef.pending");
+      .addCase(DeleteChef.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to delete chef";
+      })
+      .addCase(UpdateChef.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(UpdateChef.fulfilled, (state, action) => {
         const index = state.chefs.findIndex(
@@ -61,7 +81,11 @@ const chefsSlice = createSlice({
         if (index !== -1) {
           state.chefs[index] = action.payload;
         }
-        console.log("updateChef.fulfilled");
+        state.loading = false;
+      })
+      .addCase(UpdateChef.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to update chef";
       });
   },
 });
@@ -98,6 +122,5 @@ export const UpdateChef = createAsyncThunk(
   }
 );
 
-export const { setChefs } =
-  chefsSlice.actions;
+export const { setChefs } = chefsSlice.actions;
 export default chefsSlice.reducer;

@@ -1,5 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchDishes, createDish, deleteDish, updateDish } from "../../api/fetchDishes";
+import {
+  fetchDishes,
+  createDish,
+  deleteDish,
+  updateDish,
+} from "../../api/dishesApi";
 import { DishInterface } from "../../constants/interfaces";
 
 interface Dish {
@@ -14,10 +19,14 @@ interface Dish {
 
 interface DishesState {
   dishes: Dish[];
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: DishesState = {
   dishes: [{ id: "" }],
+  loading: false,
+  error: null,
 };
 
 const dishSlice = createSlice({
@@ -30,31 +39,47 @@ const dishSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getDishes.pending, () => {
-        console.log("getDishes.pending");
+      .addCase(getDishes.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(getDishes.fulfilled, (state, action) => {
-        console.log("getDishes.fulfilled");
         state.dishes = action.payload;
+        state.loading = false;
       })
-      .addCase(CreateDish.pending, () => {
-        console.log("createDish.pending");
+      .addCase(getDishes.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to fetch dishes";
+      })
+      .addCase(CreateDish.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(CreateDish.fulfilled, (state, action) => {
         state.dishes.push(action.payload);
-        console.log("createDish.fulfilled");
+        state.loading = false;
       })
-      .addCase(DeleteDish.pending, () => {
-        console.log("deleteDish.pending");
+      .addCase(CreateDish.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to create dish";
+      })
+      .addCase(DeleteDish.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(DeleteDish.fulfilled, (state, action) => {
         state.dishes = state.dishes.filter(
           (dish) => dish.id !== action.payload.dish._id
         );
-        console.log("deleteDish.fulfilled");
+        state.loading = false;
       })
-      .addCase(UpdateDish.pending, () => {
-        console.log("updateDish.pending");
+      .addCase(DeleteDish.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to delete dish";
+      })
+      .addCase(UpdateDish.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(UpdateDish.fulfilled, (state, action) => {
         const index = state.dishes.findIndex(
@@ -63,7 +88,11 @@ const dishSlice = createSlice({
         if (index !== -1) {
           state.dishes[index] = action.payload;
         }
-        console.log("updateDish.fulfilled");
+        state.loading = false;
+      })
+      .addCase(UpdateDish.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to update dish";
       });
   },
 });

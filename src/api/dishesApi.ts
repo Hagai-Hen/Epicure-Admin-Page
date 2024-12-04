@@ -18,7 +18,7 @@ export const fetchDishes = async () => {
 
 export const createDish = async (dishData: DishInterface) => {
   try {
-    if (dishData.tags) {
+    if (dishData.tags && !Array.isArray(dishData.tags)) {
       dishData.tags = [dishData.tags];
     }
     const response = await fetch(`/api/dishes/create`, {

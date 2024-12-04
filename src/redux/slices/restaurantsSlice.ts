@@ -4,7 +4,7 @@ import {
   fetchRestaurants,
   deleteRestaurant,
   updateRestaurant,
-} from "../../api/fetchRestaurants";
+} from "../../api/restaurantsApi";
 import { RestaurantInterface } from "../../constants/interfaces";
 
 interface Restaurant {
@@ -18,10 +18,14 @@ interface Restaurant {
 
 interface RestaurantsState {
   restaurants: Restaurant[];
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: RestaurantsState = {
   restaurants: [{ id: "" }],
+  loading: false,
+  error: null,
 };
 
 const restaurantSlice = createSlice({
@@ -34,31 +38,47 @@ const restaurantSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getRestaurants.pending, () => {
-        console.log("getRestaurants.pending");
+      .addCase(getRestaurants.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(getRestaurants.fulfilled, (state, action) => {
-        console.log("getRestaurants.fulfilled");
         state.restaurants = action.payload;
+        state.loading = false;
       })
-      .addCase(CreateRestaurant.pending, () => {
-        console.log("createRestaurants.pending");
+      .addCase(getRestaurants.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to fetch restaurants";
+      })
+      .addCase(CreateRestaurant.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(CreateRestaurant.fulfilled, (state, action) => {
         state.restaurants.push(action.payload);
-        console.log("createRestaurants.fulfilled");
+        state.loading = false;
       })
-      .addCase(DeleteRestaurant.pending, () => {
-        console.log("deleteRestaurants.pending");
+      .addCase(CreateRestaurant.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to create restaurant";
+      })
+      .addCase(DeleteRestaurant.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(DeleteRestaurant.fulfilled, (state, action) => {
         state.restaurants = state.restaurants.filter(
           (restaurant) => restaurant.id !== action.payload.restaurant._id
         );
-        console.log("deleteRestaurants.fulfilled");
+        state.loading = false;
       })
-      .addCase(UpdateRestaurant.pending, () => {
-        console.log("updateRestaurants.pending");
+      .addCase(DeleteRestaurant.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to delete restaurant";
+      })
+      .addCase(UpdateRestaurant.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(UpdateRestaurant.fulfilled, (state, action) => {
         const index = state.restaurants.findIndex(
@@ -67,7 +87,11 @@ const restaurantSlice = createSlice({
         if (index !== -1) {
           state.restaurants[index] = action.payload;
         }
-        console.log("updateRestaurants.fulfilled");
+        state.loading = false;
+      })
+      .addCase(UpdateRestaurant.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to update restaurant";
       });
   },
 });
