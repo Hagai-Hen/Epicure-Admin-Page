@@ -1,4 +1,5 @@
 import { ChefInterface } from "../constants/interfaces";
+import { getRestaurantName } from "./restaurantsApi";
 
 export const fetchChefs = async () => {
   try {
@@ -7,9 +8,24 @@ export const fetchChefs = async () => {
     if (data.error) {
       throw new Error(data.error);
     }
-    const transformedData = data.map((chef: ChefInterface) => {
-      return { ...chef, id: chef._id, _id: undefined };
-    });
+    const transformedData = await Promise.all(
+      data.map(async (chef: ChefInterface) => {
+        const restaurantNamesForChef = await Promise.all(
+          chef.restaurants.map(async (restaurantId: string) => {
+            const dishName = await getRestaurantName(restaurantId) || "Can't find restaurant's name";
+            return dishName;
+          })
+        );
+
+        return {
+          ...chef,
+          restaurants: restaurantNamesForChef,
+          id: chef._id,
+          _id: undefined,
+        };
+      })
+    );
+
     return transformedData;
   } catch (error) {
     console.log("Error getting chefs:", (error as Error).message);

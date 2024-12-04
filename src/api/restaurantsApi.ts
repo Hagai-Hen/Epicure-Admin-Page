@@ -12,7 +12,7 @@ export const fetchRestaurants = async () => {
       data.map(async (restaurant: RestaurantInterface) => {
         const dishNamesForRestaurant = await Promise.all(
           restaurant.dishes.map(async (dishId: string) => {
-            const dishName = await getDishName(dishId);
+            const dishName = await getDishName(dishId) || "Can't find dish's name";
             return dishName;
           })
         );
@@ -29,6 +29,20 @@ export const fetchRestaurants = async () => {
     return transformedData;
   } catch (error) {
     console.log("Error getting restaurants:", (error as Error).message);
+  }
+};
+
+export const getRestaurantName = async (id: string) => {
+  try {
+    const response = await fetch(`/api/restaurants/get/${id}`);
+    const data = await response.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    console.log(data.name)
+    return data.name;
+  } catch (error) {
+    console.log("Error getting restaurant name:", (error as Error).message);
   }
 };
 
