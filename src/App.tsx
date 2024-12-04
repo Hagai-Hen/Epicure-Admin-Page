@@ -1,22 +1,13 @@
 import SideBar from "./components/SideBar/SideBar.tsx";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import {
-  ChefColumns,
-  RestaurantColumns,
-  DishColumns,
-} from "./components/Dashboard/columns";
 import { AppContainer } from "./styles.ts";
 import { SIDE_BAR } from "./resources/content.ts";
-import { PAGE_NAMES, ROUTES } from "./constants/routes.ts";
+import { ROUTES } from "./constants/routes.ts";
 import CollectionPage from "./pages/collection/Collection.tsx";
-
 
 function App() {
   const [activePage, setActivePage] = useState<string>("");
-
-
 
   return (
     <AppContainer>
