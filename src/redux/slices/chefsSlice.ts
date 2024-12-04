@@ -1,12 +1,12 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { COLLECTIONS_DATA } from "../../resources/content";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import fetchChefs from "../../api/fetchChefs";
 
 interface Chef {
   id: string;
-  name: string;
-  img: string;
-  description: string;
-  restaurants: string[];
+  name?: string;
+  img?: string;
+  description?: string;
+  restaurants?: string[];
 }
 
 interface ChefsState {
@@ -14,7 +14,7 @@ interface ChefsState {
 }
 
 const initialState: ChefsState = {
-  chefs: COLLECTIONS_DATA.CHEFS.data,
+  chefs: [{id: ''}],
 };
 
 const chefsSlice = createSlice({
@@ -39,7 +39,25 @@ const chefsSlice = createSlice({
       state.chefs = state.chefs.filter((chef) => chef.id !== action.payload);
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getChefs.pending, () => {
+        console.log("getChefs.pending");
+      })
+      .addCase(getChefs.fulfilled, (state, action) => {
+        console.log("getChefs.fulfilled")
+        state.chefs = action.payload;
+      });
+  },
 });
+
+export const getChefs = createAsyncThunk(
+  "chefs/getall",
+  async () => {
+    const chefs = await fetchChefs();
+    return chefs;
+  }
+);
 
 export const { setChefs, createChef, updateChef, deleteChef } =
   chefsSlice.actions;

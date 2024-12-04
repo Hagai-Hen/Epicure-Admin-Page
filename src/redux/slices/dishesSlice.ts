@@ -1,14 +1,14 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { COLLECTIONS_DATA } from "../../resources/content";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import fetchDishes from "../../api/fetchDishes";
 
 interface Dish {
   id: string;
-  name: string;
+  name?: string;
   img?: string;
-  price: number;
-  ingredients: string;
-  restaurant: string;
-  tags: string[];
+  price?: number;
+  ingredients?: string;
+  restaurant?: string;
+  tags?: string[];
 }
 
 interface DishesState {
@@ -16,7 +16,7 @@ interface DishesState {
 }
 
 const initialState: DishesState = {
-  dishes: COLLECTIONS_DATA.DISHES.data,
+  dishes: [{ id: "" }],
 };
 
 const dishSlice = createSlice({
@@ -41,6 +41,21 @@ const dishSlice = createSlice({
       state.dishes = state.dishes.filter((dish) => dish.id !== action.payload);
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getDishes.pending, () => {
+        console.log("getDishes.pending");
+      })
+      .addCase(getDishes.fulfilled, (state, action) => {
+        console.log("getDishes.fulfilled");
+        state.dishes = action.payload;
+      });
+  },
+});
+
+export const getDishes = createAsyncThunk("dishes/getall", async () => {
+  const dishes = await fetchDishes();
+  return dishes;
 });
 
 export const { setDishes, createDish, updateDish, deleteDish } =

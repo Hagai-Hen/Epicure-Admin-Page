@@ -1,13 +1,13 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { COLLECTIONS_DATA } from "../../resources/content";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { fetchRestaurants } from "../../api/fetchRestaurants";
 
 interface Restaurant {
   id: string;
-  name: string;
-  img: string;
-  chef_name: string;
-  rate: number;
-  dishes: string[];
+  name?: string;
+  img?: string;
+  chef_name?: string;
+  rate?: number;
+  dishes?: string[];
 }
 
 interface RestaurantsState {
@@ -15,7 +15,7 @@ interface RestaurantsState {
 }
 
 const initialState: RestaurantsState = {
-  restaurants: COLLECTIONS_DATA.RESTAURANTS.data,
+  restaurants: [{id: ''}],
 };
 
 const restaurantSlice = createSlice({
@@ -29,16 +29,43 @@ const restaurantSlice = createSlice({
       state.restaurants.push(action.payload);
     },
     updateRestaurant: (state, action: PayloadAction<Restaurant>) => {
-      const index = state.restaurants.findIndex((restaurant) => restaurant.id === action.payload.id);
+      const index = state.restaurants.findIndex(
+        (restaurant) => restaurant.id === action.payload.id
+      );
       if (index !== -1) {
         state.restaurants[index] = action.payload;
       }
     },
     deleteRestaurant: (state, action: PayloadAction<string>) => {
-      state.restaurants = state.restaurants.filter((restaurant) => restaurant.id !== action.payload);
+      state.restaurants = state.restaurants.filter(
+        (restaurant) => restaurant.id !== action.payload
+      );
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getRestaurants.pending, () => {
+        console.log("getRestaurants.pending");
+      })
+      .addCase(getRestaurants.fulfilled, (state, action) => {
+        console.log("getRestaurants.fulfilled")
+        state.restaurants = action.payload;
+      });
   },
 });
 
-export const { setRestaurants, createRestaurant, updateRestaurant, deleteRestaurant } = restaurantSlice.actions;
+export const getRestaurants = createAsyncThunk(
+  "restaurants/getall",
+  async () => {
+    const restaurants = await fetchRestaurants();
+    return restaurants;
+  }
+);
+
+export const {
+  setRestaurants,
+  createRestaurant,
+  updateRestaurant,
+  deleteRestaurant,
+} = restaurantSlice.actions;
 export default restaurantSlice.reducer;

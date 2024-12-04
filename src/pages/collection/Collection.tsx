@@ -8,6 +8,7 @@ import {
   createChef,
   updateChef,
   deleteChef,
+  getChefs,
 } from "../../redux/slices/chefsSlice";
 
 import {
@@ -15,6 +16,7 @@ import {
   createRestaurant,
   updateRestaurant,
   deleteRestaurant,
+  getRestaurants,
 } from "../../redux/slices/restaurantsSlice";
 
 import {
@@ -22,6 +24,7 @@ import {
   createDish,
   updateDish,
   deleteDish,
+  getDishes,
 } from "../../redux/slices/dishesSlice";
 import { useEffect } from "react";
 
@@ -31,18 +34,21 @@ const collectionToActionsMap: Record<string, any> = {
     createAction: createChef,
     updateAction: updateChef,
     deleteAction: deleteChef,
+    getAction: getChefs,
   },
   restaurants: {
     setAction: setRestaurants,
     createAction: createRestaurant,
     updateAction: updateRestaurant,
     deleteAction: deleteRestaurant,
+    getAction: getRestaurants,
   },
   dishes: {
     setAction: setDishes,
     createAction: createDish,
     updateAction: updateDish,
     deleteAction: deleteDish,
+    getAction: getDishes,
   },
 };
 
@@ -69,6 +75,11 @@ function CollectionPage({
 
   const collectionData =
     COLLECTIONS_DATA[collection.toUpperCase() as keyof typeof COLLECTIONS_DATA];
+
+  useEffect(() => {
+    dispatch(actions.getAction());
+  }, [collection]);
+
   const data = useSelector(
     (state: any) => state[collection.toLowerCase()][collection.toLowerCase()]
   );

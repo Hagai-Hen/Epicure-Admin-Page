@@ -36,6 +36,7 @@ interface DashboardProps {
     createAction: (data: any) => UnknownAction;
     updateAction: (data: any) => UnknownAction;
     deleteAction: (id: string) => UnknownAction;
+    getData: () => UnknownAction;
   };
 }
 interface RowData {
@@ -52,13 +53,14 @@ export const Dashboard = ({
   const navigate = useNavigate();
 
   const [editingRow, setEditingRow] = useState<RowData | null>(null);
-  const [editedRowData, setEditedRowData] = useState<RowData>();
+  const [editedRowData, setEditedRowData] = useState<RowData>({ id: "" });
   const [rowsData, setRowsData] = useState<RowData[]>(data);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEditFormValid, setIsEditFormValid] = useState(true);
+
 
   const paginationModel = { page: 0, pageSize: 5 };
 
