@@ -32,8 +32,6 @@ export const createChef = async (chefData: ChefInterface) => {
       data._id = undefined;
     }
 
-    console.log("data", data);
-
     return data;
   } catch (error) {
     console.error("Error creating chef:", error);

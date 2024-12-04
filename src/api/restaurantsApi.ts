@@ -39,7 +39,6 @@ export const createRestaurant = async (restaurantData: string) => {
 
 export const deleteRestaurant = async (id: string) => {
   try {
-    console.log("hey", id)
     const response = await fetch(`/api/restaurants/delete/${id}`, {
       method: "DELETE",
       headers: {

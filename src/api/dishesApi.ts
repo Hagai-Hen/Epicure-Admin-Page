@@ -35,8 +35,6 @@ export const createDish = async (dishData: DishInterface) => {
       data._id = undefined;
     }
 
-    console.log(data, "data");
-
     return data;
   } catch (error) {
     console.error("Error creating dish:", error);
