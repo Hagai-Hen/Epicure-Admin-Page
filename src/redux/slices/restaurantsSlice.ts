@@ -5,6 +5,7 @@ import {
   deleteRestaurant,
   updateRestaurant,
 } from "../../api/fetchRestaurants";
+import { RestaurantInterface } from "../../constants/interfaces";
 
 interface Restaurant {
   id: string;
@@ -97,7 +98,7 @@ export const DeleteRestaurant = createAsyncThunk(
 
 export const UpdateRestaurant = createAsyncThunk(
   "restaurants/update",
-  async (restaurantData) => {
+  async (restaurantData: RestaurantInterface) => {
     const restaurant = await updateRestaurant(restaurantData);
     return restaurant;
   }

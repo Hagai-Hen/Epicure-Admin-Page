@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import fetchDishes from "../../api/fetchDishes";
+import { fetchDishes, createDish, deleteDish, updateDish } from "../../api/fetchDishes";
+import { DishInterface } from "../../constants/interfaces";
 
 interface Dish {
   id: string;
@@ -26,20 +27,6 @@ const dishSlice = createSlice({
     setDishes: (state, action: PayloadAction<Dish[]>) => {
       state.dishes = action.payload;
     },
-    createDish: (state, action: PayloadAction<Dish>) => {
-      state.dishes.push(action.payload);
-    },
-    updateDish: (state, action: PayloadAction<Dish>) => {
-      const index = state.dishes.findIndex(
-        (dish) => dish.id === action.payload.id
-      );
-      if (index !== -1) {
-        state.dishes[index] = action.payload;
-      }
-    },
-    deleteDish: (state, action: PayloadAction<string>) => {
-      state.dishes = state.dishes.filter((dish) => dish.id !== action.payload);
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -49,6 +36,34 @@ const dishSlice = createSlice({
       .addCase(getDishes.fulfilled, (state, action) => {
         console.log("getDishes.fulfilled");
         state.dishes = action.payload;
+      })
+      .addCase(CreateDish.pending, () => {
+        console.log("createDish.pending");
+      })
+      .addCase(CreateDish.fulfilled, (state, action) => {
+        state.dishes.push(action.payload);
+        console.log("createDish.fulfilled");
+      })
+      .addCase(DeleteDish.pending, () => {
+        console.log("deleteDish.pending");
+      })
+      .addCase(DeleteDish.fulfilled, (state, action) => {
+        state.dishes = state.dishes.filter(
+          (dish) => dish.id !== action.payload.dish._id
+        );
+        console.log("deleteDish.fulfilled");
+      })
+      .addCase(UpdateDish.pending, () => {
+        console.log("updateDish.pending");
+      })
+      .addCase(UpdateDish.fulfilled, (state, action) => {
+        const index = state.dishes.findIndex(
+          (dish) => dish.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.dishes[index] = action.payload;
+        }
+        console.log("updateDish.fulfilled");
       });
   },
 });
@@ -58,6 +73,29 @@ export const getDishes = createAsyncThunk("dishes/getall", async () => {
   return dishes;
 });
 
-export const { setDishes, createDish, updateDish, deleteDish } =
-  dishSlice.actions;
+export const CreateDish = createAsyncThunk(
+  "dishes/create",
+  async (dishData: string) => {
+    const dish = await createDish(dishData);
+    return dish;
+  }
+);
+
+export const DeleteDish = createAsyncThunk(
+  "dishes/delete",
+  async (id: string) => {
+    const dish = await deleteDish(id);
+    return dish;
+  }
+);
+
+export const UpdateDish = createAsyncThunk(
+  "dishes/update",
+  async (dishData: DishInterface) => {
+    const dish = await updateDish(dishData);
+    return dish;
+  }
+);
+
+export const { setDishes } = dishSlice.actions;
 export default dishSlice.reducer;

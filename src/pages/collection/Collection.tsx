@@ -21,9 +21,9 @@ import {
 
 import {
   setDishes,
-  createDish,
-  updateDish,
-  deleteDish,
+  CreateDish,
+  UpdateDish,
+  DeleteDish,
   getDishes,
 } from "../../redux/slices/dishesSlice";
 import { useEffect } from "react";
@@ -45,9 +45,9 @@ const collectionToActionsMap: Record<string, any> = {
   },
   dishes: {
     setAction: setDishes,
-    createAction: createDish,
-    updateAction: updateDish,
-    deleteAction: deleteDish,
+    createAction: CreateDish,
+    updateAction: UpdateDish,
+    deleteAction: DeleteDish,
     getAction: getDishes,
   },
 };
