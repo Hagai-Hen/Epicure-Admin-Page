@@ -1,5 +1,12 @@
 import React from "react";
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Button,
+} from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
 
 interface EditDialogProps {
@@ -12,14 +19,22 @@ interface EditDialogProps {
   onCancel: () => void;
 }
 
-const EditDialog: React.FC<EditDialogProps> = ({ open, editedRowData, columnData, isFormValid, onFieldChange, onSave, onCancel }) => {
+const EditDialog: React.FC<EditDialogProps> = ({
+  open,
+  editedRowData,
+  columnData,
+  isFormValid,
+  onFieldChange,
+  onSave,
+  onCancel,
+}) => {
   return (
     <Dialog open={open} onClose={onCancel}>
       <DialogTitle>{DASHBOARD.EDIT_DIALOG.TITLE}</DialogTitle>
       <DialogContent>
         {columnData?.map((col: any) => {
           const { field, headerName, type } = col;
-          if (field === "actions") return null;
+          if (field === "actions" || field === "id") return null;
           const value = editedRowData[field] || "";
 
           return (

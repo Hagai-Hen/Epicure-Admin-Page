@@ -65,9 +65,6 @@ export const deleteDish = async (id: string) => {
 
 export const updateDish = async (dishData: DishInterface) => {
   try {
-    if (dishData.tags) {
-      dishData.tags = [dishData.tags];
-    }
     const response = await fetch(`/api/dishes/update/${dishData.id}`, {
       method: "PUT",
       headers: {

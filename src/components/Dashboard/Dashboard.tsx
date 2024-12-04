@@ -80,7 +80,6 @@ export const Dashboard = ({
   useEffect(() => {
     setActivePage(collection || "");
     setRowsData(data);
-    console.log("2", rowsData);
   }, [collection, data]);
 
   const handleCreateDialogOpen = useCallback(() => {
@@ -98,11 +97,9 @@ export const Dashboard = ({
   );
 
   const handleSaveCreate = useCallback(() => {
-    const newRow = { id: `${rowsData.length + 1}`, ...newRowData };
-    dispatch(actions.createAction(newRow));
-    setRowsData((prevRows) => [...prevRows, newRow]);
-    console.log("3", rowsData);
-    setNewRowData({});
+    dispatch(actions.createAction(newRowData));
+    // setRowsData((prevRows) => [...prevRows, newRow]);
+    // setNewRowData({});
     setOpenCreateDialog(false);
   }, [rowsData, newRowData]);
 
@@ -124,11 +121,9 @@ export const Dashboard = ({
   const confirmDelete = useCallback(() => {
     if (rowToDelete) {
       dispatch(actions.deleteAction(rowToDelete.id));
-      setRowsData((prevRows) =>
-        prevRows.filter((row) => row.id !== rowToDelete.id)
-      );
-
-      console.log("1", rowsData);
+      // setRowsData((prevRows) =>
+      //   prevRows.filter((row) => row.id !== rowToDelete.id)
+      // );
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
@@ -158,11 +153,8 @@ export const Dashboard = ({
   );
 
   const handleSaveEdit = useCallback(() => {
-    const updatedRows = rowsData.map((row) =>
-      row.id === editingRow?.id ? { ...row, ...editedRowData } : row
-    );
     setEditingRow(null);
-    setRowsData(updatedRows);
+    // setRowsData(updatedRows);
     dispatch(actions.updateAction(editedRowData));
   }, [rowsData, editingRow, editedRowData]);
 
