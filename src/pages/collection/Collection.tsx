@@ -26,30 +26,20 @@ import {
   DeleteDish,
   getDishes,
 } from "../../redux/slices/dishesSlice";
+
+import {
+  getCollection,
+  createCollectionItem,
+  deleteCollectionItem,
+  updateCollectionItem,
+} from "../../redux/slices/collectionsSlice";
 import { useEffect } from "react";
 
 const collectionToActionsMap: Record<string, any> = {
-  chefs: {
-    setAction: setChefs,
-    createAction: CreateChef,
-    updateAction: UpdateChef,
-    deleteAction: DeleteChef,
-    getAction: getChefs,
-  },
-  restaurants: {
-    setAction: setRestaurants,
-    createAction: CreateRestaurant,
-    updateAction: UpdateRestaurant,
-    deleteAction: DeleteRestaurant,
-    getAction: getRestaurants,
-  },
-  dishes: {
-    setAction: setDishes,
-    createAction: CreateDish,
-    updateAction: UpdateDish,
-    deleteAction: DeleteDish,
-    getAction: getDishes,
-  },
+  getAction: getCollection,
+  createAction: createCollectionItem,
+  deleteAction: deleteCollectionItem,
+  updateAction: updateCollectionItem,
 };
 
 function CollectionPage({
@@ -67,7 +57,7 @@ function CollectionPage({
     return <h1>{COLLECTIONS.NOT_FOUND}</h1>;
   }
 
-  const actions = collectionToActionsMap[collection.toLowerCase()];
+  const actions = collectionToActionsMap;
 
   if (!actions) {
     return <h1>{COLLECTIONS.NOT_FOUND}</h1>;
@@ -77,12 +67,13 @@ function CollectionPage({
     COLLECTIONS_DATA[collection.toUpperCase() as keyof typeof COLLECTIONS_DATA];
 
   useEffect(() => {
-    dispatch(actions.getAction());
+    dispatch(getCollection(collection.toLowerCase()));
   }, [collection, actions.deleteAction]);
 
-  const data = useSelector(
-    (state: any) => state[collection.toLowerCase()][collection.toLowerCase()]
-  );
+  const data = useSelector((state: any) => {
+    state.collections[collection.toLowerCase()].items;
+    console.log(state.collections);
+  });
 
   useEffect(() => {
     if (!data || data.length === 0) {

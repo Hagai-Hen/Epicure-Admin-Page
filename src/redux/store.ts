@@ -1,13 +1,9 @@
-import { configureStore } from "@reduxjs/toolkit";
-import chefsReducer from "./slices/chefsSlice";
-import restaurantsReducer from "./slices/restaurantsSlice";
-import dishesReducer from "./slices/dishesSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import collectionsReducer from './slices/collectionsSlice';
 
 const store = configureStore({
   reducer: {
-    chefs: chefsReducer,
-    restaurants: restaurantsReducer,
-    dishes: dishesReducer,
+    collections: collectionsReducer,
   },
 });
 
