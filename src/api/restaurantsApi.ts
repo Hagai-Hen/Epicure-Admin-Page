@@ -9,11 +9,31 @@ export const fetchRestaurants = async () => {
       throw new Error(data.error);
     }
 
+    // const transformedData = await Promise.all(
+    //   data.map(async (restaurant: RestaurantInterface) => {
+    //     const dishesForRestaurant = await Promise.all(
+    //       restaurant.dishes.map(async (dishId: string) => {
+    //         const dishName = await getDishName(dishId) || "";
+    //         return {
+    //           id: dishId,  // Dish ID
+    //           name: dishName,  // Dish name
+    //         };
+    //       })
+    //     );
+
+    //     return {
+    //       ...restaurant,
+    //       dishes: dishesForRestaurant,  // Now an array of { id, name } objects
+    //       id: restaurant._id,
+    //       _id: undefined,
+    //     };
+    //   })
+    // );
     const transformedData = await Promise.all(
       data.map(async (restaurant: RestaurantInterface) => {
         const dishNamesForRestaurant = await Promise.all(
           restaurant.dishes.map(async (dishId: string) => {
-            const dishName = await getDishName(dishId) || "";
+            const dishName = (await getDishName(dishId)) || "";
             return dishName;
           })
         );
@@ -95,13 +115,16 @@ export const deleteRestaurant = async (id: string) => {
 
 export const updateRestaurant = async (restaurantData: RestaurantInterface) => {
   try {
-    const response = await fetch(`/api/restaurants/update/${restaurantData.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(restaurantData),
-    });
+    const response = await fetch(
+      `/api/restaurants/update/${restaurantData.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(restaurantData),
+      }
+    );
     const data = await response.json();
     if (data.error) {
       throw new Error(data.error);

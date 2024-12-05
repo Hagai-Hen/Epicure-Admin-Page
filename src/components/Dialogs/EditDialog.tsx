@@ -6,6 +6,12 @@ import {
   DialogTitle,
   TextField,
   Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
 
@@ -14,7 +20,9 @@ interface EditDialogProps {
   editedRowData: any;
   columnData: any;
   isFormValid: boolean;
-  onFieldChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFieldChange: (
+    e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
+  ) => void;
   onSave: () => void;
   onCancel: () => void;
   collection: string | undefined;
@@ -37,12 +45,36 @@ const EditDialog: React.FC<EditDialogProps> = ({
       </DialogTitle>
       <DialogContent>
         {columnData?.map((col: any) => {
-          const { field, headerName, type } = col;
+          const { field, headerName, type, options, multiple } = col;
           if (field === "actions" || field === "id" || field === "chef_name")
             return null;
-          const value = editedRowData[field] || "";
-
-          return (
+          const value = editedRowData[field] || [];
+          const isList = col.type === "list";
+          return isList ? (
+            <FormControl fullWidth margin="normal" key={field}>
+              <InputLabel>{headerName}</InputLabel>
+              <Select
+                multiple={multiple}
+                name={field}
+                value={value}
+                onChange={onFieldChange} // Call onFieldChange to update the state
+                label={headerName}
+              >
+                {options.map((option: any) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {multiple ? (
+                      <>
+                        <Checkbox checked={value.includes(option.id)} />
+                        <ListItemText primary={option.name} />
+                      </>
+                    ) : (
+                      <ListItemText primary={option.name} />
+                    )}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
             <TextField
               key={field}
               label={headerName}

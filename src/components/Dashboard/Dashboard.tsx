@@ -82,6 +82,30 @@ export const Dashboard = ({
     setRowsData(data);
   }, [collection, data]);
 
+  // const extractNamesFromData = (data: any): any => {
+  //   console.log(data);
+
+  //   if (Array.isArray(data)) {
+  //     return data.map(extractNamesFromData);
+  //   }
+
+  //   if (data && typeof data === "object") {
+  //     return Object.keys(data).reduce((acc: any, key: string) => {
+  //       const value = data[key];
+
+  //       if (Array.isArray(value)) {
+  //         acc[key] = value.map((item: any) => {
+  //           return item && item.hasOwnProperty("name") ? item.name : item;
+  //         });
+  //       } else {
+  //         acc[key] = extractNamesFromData(value);
+  //       }
+  //       return acc;
+  //     }, {});
+  //   }
+  //     return data;
+  // };
+
   const handleCreateDialogOpen = useCallback(() => {
     setOpenCreateDialog(true);
   }, []);
@@ -139,7 +163,9 @@ export const Dashboard = ({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
       setEditedRowData((prev: any) => {
-        const updated = { ...prev, [name]: value };
+        const previousValue = prev[name] || "";
+        const previousValueLength = previousValue.length;
+        const updated = { ...prev, [name]: value.slice(previousValueLength) };
         const isValid = Object.values(updated).every((val) => val !== "");
         setIsEditFormValid(isValid);
         return updated;
@@ -162,17 +188,17 @@ export const Dashboard = ({
   }, [navigate]);
 
   const updatedColumns = columnData
-  .filter((col) => col.field !== "chef")
-  .map((col) => {
-    if (col.field === "actions") {
-      return {
-        ...col,
-        renderCell: (params: any) =>
-          renderActionsCell({ ...params, api: { gridOptions } }),
-      };
-    }
-    return col;
-  });
+    .filter((col) => col.field !== "chef")
+    .map((col) => {
+      if (col.field === "actions") {
+        return {
+          ...col,
+          renderCell: (params: any) =>
+            renderActionsCell({ ...params, api: { gridOptions } }),
+        };
+      }
+      return col;
+    });
 
   const gridOptions = {
     handleEdit,
