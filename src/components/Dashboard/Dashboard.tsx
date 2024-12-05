@@ -7,37 +7,60 @@ import CreateDialog from "../Dialogs/CreateDialog";
 import EditDialog from "../Dialogs/EditDialog";
 import DeleteDialog from "../Dialogs/DeleteDialog";
 import { GridColDef } from "@mui/x-data-grid";
-import { CustomPaper, DashboardContainer, DashboardCreateButton, DashboardHeaderContainer, DashboardLeftHeader, DashboardRightHeader, DashboardHeaderTitle, DashboardBackContainer, DashboardBackIcon, DashboardHeaderBack, DashboardHeaderEntries } from "./styles";
+import { useDispatch } from "react-redux";
+import {
+  CustomPaper,
+  DashboardContainer,
+  DashboardCreateButton,
+  DashboardHeaderContainer,
+  DashboardLeftHeader,
+  DashboardRightHeader,
+  DashboardHeaderTitle,
+  DashboardBackContainer,
+  DashboardBackIcon,
+  DashboardHeaderBack,
+  DashboardHeaderEntries,
+} from "./styles";
+import { UnknownAction } from "@reduxjs/toolkit";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
 }
 
+interface DashboardProps {
+  data: any[];
+  setActivePage: (page: string) => void;
+  columnData: Column[];
+  actions: {
+    setAction: (data: any[]) => void;
+    createAction: (data: any) => UnknownAction;
+    updateAction: (data: any) => UnknownAction;
+    deleteAction: (id: string) => UnknownAction;
+  };
+}
 interface RowData {
   id: string;
 }
 
-interface SideBarProps {
-  data: RowData[];
-  setActivePage: (page: string) => void;
-  columnData: Column[];
-}
+export const Dashboard = ({
+  data,
+  setActivePage,
+  columnData,
+  actions,
+}: DashboardProps) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-export const Dashboard: React.FC<SideBarProps> = ({ data, setActivePage, columnData }) => {
-  const [rowsData, setRowsData] = useState<RowData[]>(data);
   const [editingRow, setEditingRow] = useState<RowData | null>(null);
-  const [editedRowData, setEditedRowData] = useState<RowData | any>({});
+  const [editedRowData, setEditedRowData] = useState<RowData>({ id: "" });
+  const [rowsData, setRowsData] = useState<RowData[]>(data);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(false); 
-  const [isEditFormValid, setIsEditFormValid] = useState(true); 
-  const paginationModel = { page: 0, pageSize: 5 };
-  const navigate = useNavigate();
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [isEditFormValid, setIsEditFormValid] = useState(true);
 
-  const { collection } = useParams<{ collection: string }>();
-  let displayName = "";
-  if (collection) displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
+  const paginationModel = { page: 0, pageSize: 5 };
 
   const newRowDataInitial = useMemo(() => {
     return columnData.reduce((acc: any, col: Column) => {
@@ -48,6 +71,11 @@ export const Dashboard: React.FC<SideBarProps> = ({ data, setActivePage, columnD
 
   const [newRowData, setNewRowData] = useState<any>(newRowDataInitial);
 
+  const { collection } = useParams<{ collection: string }>();
+  let displayName = "";
+  if (collection)
+    displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
+
   useEffect(() => {
     setActivePage(collection || "");
     setRowsData(data);
@@ -56,17 +84,20 @@ export const Dashboard: React.FC<SideBarProps> = ({ data, setActivePage, columnD
   const handleCreateDialogOpen = useCallback(() => {
     setOpenCreateDialog(true);
   }, []);
-
-  const handleCreateFieldChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const updatedRowData = { ...newRowData, [name]: value };
-    setNewRowData(updatedRowData);
-    const isValid = Object.values(updatedRowData).every((val) => val !== "");
-    setIsFormValid(isValid);
-  }, [newRowData]);
+  const handleCreateFieldChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      const updatedRowData = { ...newRowData, [name]: value };
+      setNewRowData(updatedRowData);
+      const isValid = Object.values(updatedRowData).every((val) => val !== "");
+      setIsFormValid(isValid);
+    },
+    [newRowData]
+  );
 
   const handleSaveCreate = useCallback(() => {
-    const newRow = { id: `${rowsData.length + 1}`, ...newRowData };
+    const newRow = { id: `${data.length + 1}`, ...newRowData };
+    dispatch(actions.createAction(newRow));
     setRowsData((prevRows) => [...prevRows, newRow]);
     setNewRowData({});
     setOpenCreateDialog(false);
@@ -78,17 +109,18 @@ export const Dashboard: React.FC<SideBarProps> = ({ data, setActivePage, columnD
     setIsFormValid(false);
   }, []);
 
-  const handleDelete = useCallback((id: string) => {
-    const row = rowsData.find((row) => row.id === id);
-    if (row) setRowToDelete(row);
-    setOpenDeleteDialog(true);
-  }, [rowsData]);
+  const handleDelete = useCallback(
+    (id: string) => {
+      const row = rowsData.find((row) => row.id === id);
+      if (row) setRowToDelete(row);
+      setOpenDeleteDialog(true);
+    },
+    [rowsData]
+  );
 
   const confirmDelete = useCallback(() => {
     if (rowToDelete) {
-      setRowsData((prevRows) =>
-        prevRows.filter((row) => row.id !== rowToDelete.id)
-      );
+      dispatch(actions.deleteAction(rowToDelete.id));
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
@@ -104,22 +136,26 @@ export const Dashboard: React.FC<SideBarProps> = ({ data, setActivePage, columnD
     setEditedRowData({ ...row });
   }, []);
 
-  const handleFieldChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditedRowData((prev: any) => {
-      const updated = { ...prev, [name]: value };
-      const isValid = Object.values(updated).every((val) => val !== "");
-      setIsEditFormValid(isValid);
-      return updated;
-    });
-  }, []);
+  const handleFieldChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      setEditedRowData((prev: any) => {
+        const updated = { ...prev, [name]: value };
+        const isValid = Object.values(updated).every((val) => val !== "");
+        setIsEditFormValid(isValid);
+        return updated;
+      });
+    },
+    []
+  );
 
   const handleSaveEdit = useCallback(() => {
     const updatedRows = rowsData.map((row) =>
       row.id === editingRow?.id ? { ...row, ...editedRowData } : row
     );
-    setRowsData(updatedRows);
     setEditingRow(null);
+    setRowsData(updatedRows);
+    dispatch(actions.updateAction(editedRowData));
   }, [rowsData, editingRow, editedRowData]);
 
   const handleCancelEdit = useCallback(() => {
@@ -134,7 +170,8 @@ export const Dashboard: React.FC<SideBarProps> = ({ data, setActivePage, columnD
     if (col.field === "actions") {
       return {
         ...col,
-        renderCell: (params: any) => renderActionsCell({ ...params, api: { gridOptions } }),
+        renderCell: (params: any) =>
+          renderActionsCell({ ...params, api: { gridOptions } }),
       };
     }
     return col;
@@ -167,7 +204,7 @@ export const Dashboard: React.FC<SideBarProps> = ({ data, setActivePage, columnD
         </DashboardHeaderContainer>
         <CustomPaper>
           <DataGrid
-            rows={rowsData}
+            rows={data}
             columns={updatedColumns}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[5, 10]}
