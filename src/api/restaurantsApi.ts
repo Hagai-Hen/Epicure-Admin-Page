@@ -8,11 +8,12 @@ export const fetchRestaurants = async () => {
     if (data.error) {
       throw new Error(data.error);
     }
+
     const transformedData = await Promise.all(
       data.map(async (restaurant: RestaurantInterface) => {
         const dishNamesForRestaurant = await Promise.all(
           restaurant.dishes.map(async (dishId: string) => {
-            const dishName = await getDishName(dishId) || "Can't find dish's name";
+            const dishName = await getDishName(dishId) || "";
             return dishName;
           })
         );
@@ -28,7 +29,7 @@ export const fetchRestaurants = async () => {
 
     return transformedData;
   } catch (error) {
-    console.log("Error getting restaurants:", (error as Error).message);
+    console.error("Error getting restaurants:", (error as Error).message);
   }
 };
 
@@ -39,10 +40,9 @@ export const getRestaurantName = async (id: string) => {
     if (data.error) {
       throw new Error(data.error);
     }
-    console.log(data.name)
     return data.name;
   } catch (error) {
-    console.log("Error getting restaurant name:", (error as Error).message);
+    console.error("Error getting restaurant name:", (error as Error).message);
   }
 };
 
@@ -56,6 +56,9 @@ export const createRestaurant = async (restaurantData: string) => {
       body: JSON.stringify(restaurantData),
     });
     const data = await response.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
     if (data._id) {
       data.id = data._id;
       data._id = undefined;
@@ -63,7 +66,7 @@ export const createRestaurant = async (restaurantData: string) => {
 
     return data;
   } catch (error) {
-    console.error("Error creating restaurant:", error);
+    console.error("Error creating restaurant:", (error as Error).message);
   }
 };
 
@@ -76,6 +79,9 @@ export const deleteRestaurant = async (id: string) => {
       },
     });
     const data = await response.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
     if (data._id) {
       data.id = data._id;
       data._id = undefined;
@@ -83,7 +89,7 @@ export const deleteRestaurant = async (id: string) => {
 
     return data;
   } catch (error) {
-    console.error("Error deleting restaurant:", error);
+    console.error("Error deleting restaurant:", (error as Error).message);
   }
 };
 
@@ -95,10 +101,11 @@ export const updateRestaurant = async (restaurantData: RestaurantInterface) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(restaurantData),
-
     });
     const data = await response.json();
-
+    if (data.error) {
+      throw new Error(data.error);
+    }
     if (data._id) {
       data.id = data._id;
       data._id = undefined;
@@ -106,6 +113,6 @@ export const updateRestaurant = async (restaurantData: RestaurantInterface) => {
 
     return data;
   } catch (error) {
-    console.error("Error updating restaurant:", error);
+    console.error("Error updating restaurant:", (error as Error).message);
   }
 };

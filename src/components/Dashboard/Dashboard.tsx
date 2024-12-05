@@ -162,7 +162,7 @@ export const Dashboard = ({
   }, [navigate]);
 
   const updatedColumns = columnData
-  .filter((col) => col.field !== "chef")  // Remove the 'chef' column
+  .filter((col) => col.field !== "chef")
   .map((col) => {
     if (col.field === "actions") {
       return {

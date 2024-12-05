@@ -12,7 +12,7 @@ export const fetchChefs = async () => {
       data.map(async (chef: ChefInterface) => {
         const restaurantNamesForChef = await Promise.all(
           chef.restaurants.map(async (restaurantId: string) => {
-            const dishName = await getRestaurantName(restaurantId) || "Can't find restaurant's name";
+            const dishName = await getRestaurantName(restaurantId) || "";
             return dishName;
           })
         );
