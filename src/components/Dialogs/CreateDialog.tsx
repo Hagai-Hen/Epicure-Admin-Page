@@ -69,7 +69,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
           const { field, headerName, type, options, multiple } = col;
           if (field === "actions" || field === "id" || field === "chef_name")
             return null;
-          const value = newRowData[field] || [];
+          const value = newRowData[field] || "";
           const isList = col.type === "list";
 
           return isList ? (

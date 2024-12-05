@@ -114,7 +114,12 @@ export const Dashboard = ({
       const { name, value } = e.target;
       const updatedRowData = { ...newRowData, [name]: value };
       setNewRowData(updatedRowData);
-      const isValid = Object.values(updatedRowData).every((val) => val !== "");
+      const isValid = Object.values(updatedRowData).every((val) => {
+        if (Array.isArray(val)) {
+          return val.length > 0; // Valid if the array has items
+        }
+        return val !== "";
+      });
       setIsFormValid(isValid);
     },
     [newRowData]
