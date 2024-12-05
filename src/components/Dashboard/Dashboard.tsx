@@ -41,6 +41,9 @@ interface DashboardProps {
 }
 interface RowData {
   id: string;
+  dishes?: { id: string; name?: string }[];
+  restaurants?: { id: string; name?: string }[];
+  restaurant?: {id: string};
 }
 
 export const Dashboard = ({
@@ -82,30 +85,6 @@ export const Dashboard = ({
     setRowsData(data);
   }, [collection, data]);
 
-  // const extractNamesFromData = (data: any): any => {
-  //   console.log(data);
-
-  //   if (Array.isArray(data)) {
-  //     return data.map(extractNamesFromData);
-  //   }
-
-  //   if (data && typeof data === "object") {
-  //     return Object.keys(data).reduce((acc: any, key: string) => {
-  //       const value = data[key];
-
-  //       if (Array.isArray(value)) {
-  //         acc[key] = value.map((item: any) => {
-  //           return item && item.hasOwnProperty("name") ? item.name : item;
-  //         });
-  //       } else {
-  //         acc[key] = extractNamesFromData(value);
-  //       }
-  //       return acc;
-  //     }, {});
-  //   }
-  //     return data;
-  // };
-
   const handleCreateDialogOpen = useCallback(() => {
     setOpenCreateDialog(true);
   }, []);
@@ -116,7 +95,7 @@ export const Dashboard = ({
       setNewRowData(updatedRowData);
       const isValid = Object.values(updatedRowData).every((val) => {
         if (Array.isArray(val)) {
-          return val.length > 0; // Valid if the array has items
+          return val.length > 0;
         }
         return val !== "";
       });
@@ -168,9 +147,7 @@ export const Dashboard = ({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
       setEditedRowData((prev: any) => {
-        const previousValue = prev[name] || "";
-        const previousValueLength = previousValue.length;
-        const updated = { ...prev, [name]: value.slice(previousValueLength) };
+        const updated = { ...prev, [name]: value };
         const isValid = Object.values(updated).every((val) => val !== "");
         setIsEditFormValid(isValid);
         return updated;
@@ -180,8 +157,27 @@ export const Dashboard = ({
   );
 
   const handleSaveEdit = useCallback(() => {
+    const editedDishes = editedRowData?.dishes?.filter(
+      (dish: { id: string; name?: string }) => {
+        if (dish.id && dish.name) {
+          return false;
+        }
+        return true;
+      }
+    );
+
+    const editedRests = editedRowData?.restaurants?.filter(
+      (dish: { id: string; name?: string }) => {
+        if (dish.id && dish.name) {
+          return false;
+        }
+        return true;
+      }
+    );
+    console.log("edited", editedRowData);
+    const editedData = { ...editedRowData, dishes: editedDishes, restaurants: editedRests, restaurant: editedRowData.restaurant?.id ? editedRowData.restaurant.id : editedRowData.restaurant};
     setEditingRow(null);
-    dispatch(actions.updateAction(editedRowData));
+    dispatch(actions.updateAction(editedData));
   }, [rowsData, editingRow, editedRowData]);
 
   const handleCancelEdit = useCallback(() => {

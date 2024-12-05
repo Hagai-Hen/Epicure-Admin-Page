@@ -20,9 +20,7 @@ interface CreateDialogProps {
   newRowData: any;
   columnData: any;
   isFormValid: boolean;
-  onFieldChange: (
-    e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
-  ) => void;
+  onFieldChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSave: () => void;
   onCancel: () => void;
   setNewRowData: (row: string) => void;
@@ -69,7 +67,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
           const { field, headerName, type, options, multiple } = col;
           if (field === "actions" || field === "id" || field === "chef_name")
             return null;
-          const value = newRowData[field] || "";
+          const value = newRowData[field] || [];
           const isList = col.type === "list";
 
           return isList ? (
@@ -84,9 +82,15 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
               >
                 {options.map((option: any) => (
                   <MenuItem key={option.id} value={option.id}>
-                    <Checkbox checked={value.includes(option.id)} /> 
+                  {multiple ? (
+                    <>
+                      <Checkbox checked={value.includes(option.id)} />
+                      <ListItemText primary={option.name} />
+                    </>
+                  ) : (
                     <ListItemText primary={option.name} />
-                  </MenuItem>
+                  )}
+                </MenuItem>
                 ))}
               </Select>
             </FormControl>

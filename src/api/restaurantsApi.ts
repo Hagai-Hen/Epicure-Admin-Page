@@ -9,44 +9,26 @@ export const fetchRestaurants = async () => {
       throw new Error(data.error);
     }
 
-    // const transformedData = await Promise.all(
-    //   data.map(async (restaurant: RestaurantInterface) => {
-    //     const dishesForRestaurant = await Promise.all(
-    //       restaurant.dishes.map(async (dishId: string) => {
-    //         const dishName = await getDishName(dishId) || "";
-    //         return {
-    //           id: dishId,  // Dish ID
-    //           name: dishName,  // Dish name
-    //         };
-    //       })
-    //     );
-
-    //     return {
-    //       ...restaurant,
-    //       dishes: dishesForRestaurant,  // Now an array of { id, name } objects
-    //       id: restaurant._id,
-    //       _id: undefined,
-    //     };
-    //   })
-    // );
     const transformedData = await Promise.all(
       data.map(async (restaurant: RestaurantInterface) => {
-        const dishNamesForRestaurant = await Promise.all(
+        const dishesForRestaurant = await Promise.all(
           restaurant.dishes.map(async (dishId: string) => {
-            const dishName = (await getDishName(dishId)) || "";
-            return dishName;
+            const dishName = await getDishName(dishId) || "";
+            return {
+              id: dishId,
+              name: dishName,
+            };
           })
         );
 
         return {
           ...restaurant,
-          dishes: dishNamesForRestaurant,
+          dishes: dishesForRestaurant,
           id: restaurant._id,
           _id: undefined,
         };
       })
     );
-
     return transformedData;
   } catch (error) {
     console.error("Error getting restaurants:", (error as Error).message);
@@ -115,6 +97,7 @@ export const deleteRestaurant = async (id: string) => {
 
 export const updateRestaurant = async (restaurantData: RestaurantInterface) => {
   try {
+    console.log("here", restaurantData);
     const response = await fetch(
       `/api/restaurants/update/${restaurantData.id}`,
       {
@@ -133,6 +116,8 @@ export const updateRestaurant = async (restaurantData: RestaurantInterface) => {
       data.id = data._id;
       data._id = undefined;
     }
+
+    console.log("data", data);
 
     return data;
   } catch (error) {

@@ -8,12 +8,16 @@ export const fetchChefs = async () => {
     if (data.error) {
       throw new Error(data.error);
     }
+
     const transformedData = await Promise.all(
       data.map(async (chef: ChefInterface) => {
         const restaurantNamesForChef = await Promise.all(
           chef.restaurants.map(async (restaurantId: string) => {
-            const dishName = await getRestaurantName(restaurantId) || "";
-            return dishName;
+            const restaurantName = (await getRestaurantName(restaurantId)) || "";
+            return {
+              id: restaurantId,
+              name: restaurantName,
+            };
           })
         );
 
@@ -34,7 +38,6 @@ export const fetchChefs = async () => {
 
 export const createChef = async (chefData: ChefInterface) => {
   try {
-    
     const response = await fetch(`/api/chefs/create`, {
       method: "POST",
       headers: {
@@ -76,7 +79,6 @@ export const deleteChef = async (id: string) => {
 
 export const updateChef = async (chefData: ChefInterface) => {
   try {
-
     const response = await fetch(`/api/chefs/update/${chefData.id}`, {
       method: "PUT",
       headers: {
@@ -96,4 +98,3 @@ export const updateChef = async (chefData: ChefInterface) => {
     console.error("Error updating chef:", error);
   }
 };
-

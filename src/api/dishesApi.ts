@@ -14,7 +14,7 @@ export const fetchDishes = async () => {
     
         return {
           ...dish,
-          restaurant: restaurantName || "",
+          restaurant: {name: restaurantName || "", id: dish.restaurant},
           id: dish._id,
           _id: undefined,
         };

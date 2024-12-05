@@ -4,6 +4,9 @@ import { fetchRestaurants } from "../api/restaurantsApi";
 import {
   renderImgCell,
   renderActionsCell,
+  dishesRenderCell,
+  restaurantsRenderCell,
+  restaurantRenderCell,
 } from "../components/Dashboard/columns";
 
 export const SIDE_BAR = {
@@ -81,6 +84,7 @@ export const COLLECTIONS_DATA = {
             name: dish.name,
           }))
         ),
+        renderCell: dishesRenderCell,
         multiple: true,
         width: 130,
       },
@@ -117,6 +121,7 @@ export const COLLECTIONS_DATA = {
             name: restaurant.name,
           }))
         ),
+        renderCell: restaurantsRenderCell,
         multiple: true,
         width: 130,
       },
@@ -158,6 +163,7 @@ export const COLLECTIONS_DATA = {
             name: restaurant.name,
           }))
         ),
+        renderCell: restaurantRenderCell,
         width: 130,
       },
       {

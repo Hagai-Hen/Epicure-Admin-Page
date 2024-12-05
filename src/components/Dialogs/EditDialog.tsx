@@ -20,9 +20,7 @@ interface EditDialogProps {
   editedRowData: any;
   columnData: any;
   isFormValid: boolean;
-  onFieldChange: (
-    e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
-  ) => void;
+  onFieldChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSave: () => void;
   onCancel: () => void;
   collection: string | undefined;
@@ -48,7 +46,7 @@ const EditDialog: React.FC<EditDialogProps> = ({
           const { field, headerName, type, options, multiple } = col;
           if (field === "actions" || field === "id" || field === "chef_name")
             return null;
-          const value = editedRowData[field] || [];
+          const value = editedRowData[field] || (multiple ? [] : "");;
           const isList = col.type === "list";
           return isList ? (
             <FormControl fullWidth margin="normal" key={field}>
