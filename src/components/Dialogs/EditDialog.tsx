@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
 import { uploadImageToCloudinary } from "../../api/uploadApi";
+import { DialogImg } from "../Dashboard/styles";
 
 interface EditDialogProps {
   open: boolean;
@@ -41,14 +42,15 @@ const EditDialog: React.FC<EditDialogProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null); // For showing image preview
   const [isLoading, setIsLoading] = useState(false); // For showing the loading spinner
 
-  // When the dialog opens, check if there's an image URL to show the preview
   useEffect(() => {
     if (editedRowData.img) {
       setImagePreview(editedRowData.img);
     }
   }, [open, editedRowData]);
 
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       setIsLoading(true);
@@ -57,7 +59,7 @@ const EditDialog: React.FC<EditDialogProps> = ({
         const imageUrl = await uploadImageToCloudinary(file);
         setImagePreview(imageUrl);
         if (imageUrl) {
-          editedRowData.img = imageUrl
+          editedRowData.img = imageUrl;
         }
         onFieldChange({
           target: { name: "img", value: imageUrl },
@@ -82,7 +84,13 @@ const EditDialog: React.FC<EditDialogProps> = ({
       <DialogContent>
         {columnData?.map((col: any) => {
           const { field, headerName, type, options, multiple } = col;
-          if (field === "actions" || field === "id" || field === "chef_name" || field === "img") return null;
+          if (
+            field === "actions" ||
+            field === "id" ||
+            field === "chef_name" ||
+            field === "img"
+          )
+            return null;
           const value = editedRowData[field] || (multiple ? [] : "");
           const isList = col.type === "list";
           return isList ? (
@@ -123,27 +131,29 @@ const EditDialog: React.FC<EditDialogProps> = ({
           );
         })}
 
-        <div style={{ marginTop: "16px" }}>
+        <>
           <input type="file" onChange={handleImageChange} />
           {imagePreview && (
             <div>
-              <img
+              <DialogImg
                 src={imagePreview}
                 alt="Image preview"
                 style={{ maxWidth: "100px", marginTop: "8px" }}
               />
             </div>
           )}
-          {isLoading && (
-            <CircularProgress size={24} style={{ marginTop: 8 }} />
-          )}
-        </div>
+          {isLoading && <CircularProgress size={24} />}
+        </>
       </DialogContent>
       <DialogActions>
         <Button onClick={onCancel} color="primary">
           {DASHBOARD.EDIT_DIALOG.CANCEL}
         </Button>
-        <Button onClick={handleSave} color="primary" disabled={!isFormValid || isLoading}>
+        <Button
+          onClick={handleSave}
+          color="primary"
+          disabled={!isFormValid || isLoading}
+        >
           {DASHBOARD.EDIT_DIALOG.SAVE}
         </Button>
       </DialogActions>

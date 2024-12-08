@@ -85,3 +85,8 @@ export const TableImg = styled.img`
   height: auto;
   border-radius: 8px;
 `;
+
+export const DialogImg = styled.img`
+  max-width: 100px;
+  margin-top: 8px;
+`;

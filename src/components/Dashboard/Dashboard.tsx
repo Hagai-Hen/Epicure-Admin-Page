@@ -32,9 +32,9 @@ interface DashboardProps {
   setActivePage: (page: string) => void;
   columnData: Column[];
   actions: {
-    createAction: (params: { collection: string, item: any }) => UnknownAction;
-    updateAction: (params: { collection: string, item: any }) => UnknownAction;
-    deleteAction: (params: { collection: string, id: string }) => UnknownAction;
+    createAction: (params: { collection: string; item: any }) => UnknownAction;
+    updateAction: (params: { collection: string; item: any }) => UnknownAction;
+    deleteAction: (params: { collection: string; id: string }) => UnknownAction;
     getAction: (collection: string) => UnknownAction;
   };
 }
@@ -68,7 +68,7 @@ export const Dashboard = ({
   const newRowDataInitial = useMemo(() => {
     return columnData.reduce((acc: any, col: Column) => {
       if (col.field !== "actions" && col.field !== "img") {
-        acc[col.field] = ""; // Initialize other fields with an empty string
+        acc[col.field] = "";
       }
       return acc;
     }, {});
@@ -130,7 +130,6 @@ export const Dashboard = ({
       const row = rowsData.find((row) => row.id === id);
       if (row) setRowToDelete(row);
       setOpenDeleteDialog(true);
-      dispatch(actions.getAction(collection?.toLowerCase() || ""));
     },
     [rowsData]
   );
@@ -269,7 +268,6 @@ export const Dashboard = ({
             columns={updatedColumns}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[5, 10]}
-            checkboxSelection
           />
         </CustomPaper>
       </DashboardContainer>

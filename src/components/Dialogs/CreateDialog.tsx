@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
 import { uploadImageToCloudinary } from "../../api/uploadApi";
+import { DialogImg } from "../Dashboard/styles";
 
 interface CreateDialogProps {
   open: boolean;
@@ -154,22 +155,22 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
           );
         })}
 
-        <div style={{ marginTop: "16px" }}>
+        <>
           <input type="file" onChange={handleImageChange} />
           {loading ? (
             <CircularProgress />
           ) : (
             imagePreview && (
               <div>
-                <img
+                <DialogImg
                   src={imagePreview}
                   alt="Image preview"
-                  style={{ maxWidth: "100px", marginTop: "8px" }}
+                  
                 />
               </div>
             )
           )}
-        </div>
+        </>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCancel} color="primary">
