@@ -4,9 +4,7 @@ import { getRestaurantName } from "./restaurantsApi";
 export const fetchData = async (collection: string) => {
   try {
     const response = await fetch(`/api/${collection}/getall`);
-    console.log("collection", collection);
     const data = await response.json();
-    console.log("data", data);
 
     if (data.error) {
       throw new Error(data.error);
@@ -56,8 +54,6 @@ export const fetchData = async (collection: string) => {
         };
       })
     );
-
-    console.log(transformedData);
 
     return transformedData;
   } catch (error) {
