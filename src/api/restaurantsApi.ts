@@ -48,7 +48,7 @@ export const getRestaurantName = async (id: string) => {
   }
 };
 
-export const createRestaurant = async (restaurantData: string) => {
+export const createRestaurant = async (restaurantData: RestaurantInterface) => {
   try {
     const response = await fetch(`/api/restaurants/create`, {
       method: "POST",

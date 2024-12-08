@@ -85,7 +85,6 @@ const EditDialog: React.FC<EditDialogProps> = ({
           if (field === "actions" || field === "id" || field === "chef_name" || field === "img") return null;
           const value = editedRowData[field] || (multiple ? [] : "");
           const isList = col.type === "list";
-          console.log("val",editedRowData)
           return isList ? (
             <FormControl fullWidth margin="normal" key={field}>
               <InputLabel>{headerName}</InputLabel>
