@@ -42,7 +42,7 @@ export const dishesRenderCell = (params: any) => {
   const dishes = params.row.dishes;
   if (dishes) {
     const dishNames = dishes
-      .map((dish: { id: string; name: string }) => dish.name)
+      .map((dish: { id: string; name: string }) => dish?.name)
       .join(", ");
     return <span>{dishNames}</span>;
   }
@@ -52,7 +52,7 @@ export const restaurantsRenderCell = (params: any) => {
   const restaurants = params.row.restaurants;
   if (restaurants) {
     const restaurantNames = restaurants
-      .map((dish: { id: string; name: string }) => dish.name)
+      .map((dish: { id: string; name: string }) => dish?.name)
       .join(", ");
     return <span>{restaurantNames}</span>;
   }

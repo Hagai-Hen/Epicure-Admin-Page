@@ -32,11 +32,10 @@ interface DashboardProps {
   setActivePage: (page: string) => void;
   columnData: Column[];
   actions: {
-    setAction: (data: any[]) => void;
-    createAction: (data: any) => UnknownAction;
-    updateAction: (data: any) => UnknownAction;
-    deleteAction: (id: string) => UnknownAction;
-    getData: () => UnknownAction;
+    createAction: (params: { collection: string, item: any }) => UnknownAction;
+    updateAction: (params: { collection: string, item: any }) => UnknownAction;
+    deleteAction: (params: { collection: string, id: string }) => UnknownAction;
+    getAction: (collection: string) => UnknownAction;
   };
 }
 interface RowData {
@@ -105,7 +104,12 @@ export const Dashboard = ({
   );
 
   const handleSaveCreate = useCallback(() => {
-    dispatch(actions.createAction(newRowData));
+    dispatch(
+      actions.createAction({
+        collection: collection?.toLowerCase() || "",
+        item: newRowData,
+      })
+    );
     setOpenCreateDialog(false);
     setIsFormValid(false);
   }, [rowsData, newRowData]);
@@ -121,13 +125,20 @@ export const Dashboard = ({
       const row = rowsData.find((row) => row.id === id);
       if (row) setRowToDelete(row);
       setOpenDeleteDialog(true);
+      dispatch(actions.getAction(collection?.toLowerCase() || ""));
     },
     [rowsData]
   );
 
   const confirmDelete = useCallback(() => {
     if (rowToDelete) {
-      dispatch(actions.deleteAction(rowToDelete.id));
+      dispatch(
+        actions.deleteAction({
+          collection: collection?.toLowerCase() || "",
+          id: rowToDelete.id,
+        })
+      );
+      dispatch(actions.getAction(collection?.toLowerCase() || ""));
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
@@ -176,7 +187,13 @@ export const Dashboard = ({
     );
     const editedData = { ...editedRowData, dishes: editedDishes, restaurants: editedRests, restaurant: editedRowData.restaurant?.id ? editedRowData.restaurant.id : editedRowData.restaurant};
     setEditingRow(null);
-    dispatch(actions.updateAction(editedData));
+    dispatch(
+      actions.updateAction({
+        collection: collection?.toLowerCase() || "",
+        item: editedData,
+      })
+    );
+    dispatch(actions.getAction(collection?.toLowerCase() || ""));
   }, [rowsData, editingRow, editedRowData]);
 
   const handleCancelEdit = useCallback(() => {
@@ -216,7 +233,7 @@ export const Dashboard = ({
             </DashboardBackContainer>
             <DashboardHeaderTitle>{displayName}</DashboardHeaderTitle>
             <DashboardHeaderEntries>
-              {rowsData.length} {DASHBOARD.HEADER.ENTRIES}
+              {rowsData?.length} {DASHBOARD.HEADER.ENTRIES}
             </DashboardHeaderEntries>
           </DashboardLeftHeader>
           <DashboardRightHeader>
