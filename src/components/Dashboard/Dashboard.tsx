@@ -68,11 +68,13 @@ export const Dashboard = ({
 
   const newRowDataInitial = useMemo(() => {
     return columnData.reduce((acc: any, col: Column) => {
-      if (col.field !== "actions") acc[col.field] = "";
+      if (col.field !== "actions" && col.field !== "img") {
+        acc[col.field] = ""; // Initialize other fields with an empty string
+      }
       return acc;
     }, {});
   }, [columnData]);
-
+  
   const [newRowData, setNewRowData] = useState<any>(newRowDataInitial);
 
   const { collection } = useParams<{ collection: string }>();

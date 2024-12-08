@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogActions,
@@ -12,8 +12,10 @@ import {
   FormControl,
   Checkbox,
   ListItemText,
+  CircularProgress,
 } from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
+import { uploadImageToCloudinary } from "../../api/uploadApi";
 
 interface CreateDialogProps {
   open: boolean;
@@ -38,6 +40,9 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
   setNewRowData,
   collection,
 }) => {
+  const [imagePreview, setImagePreview] = useState<string | null>(null); // For showing image preview
+  const [loading, setLoading] = useState<boolean>(false); // For tracking loading state
+
   const initializedRowData = useMemo(() => {
     if (!open) return {};
 
@@ -57,19 +62,60 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
     setNewRowData(initializedRowData);
   }, [initializedRowData]);
 
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        setLoading(true);
+        const imageUrl = await uploadImageToCloudinary(file);
+        setImagePreview(imageUrl);
+        const updatedRowData = { ...newRowData, img: imagePreview };
+        setNewRowData(updatedRowData);
+
+        const simulatedEvent = {
+          target: {
+            name: "img",
+            value: imageUrl || "",
+          },
+        } as React.ChangeEvent<HTMLInputElement>;
+        onFieldChange(simulatedEvent);
+      } catch (error) {
+        console.error("Error uploading image", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleSave = async () => {
+    setImagePreview(null);
+    onSave();
+  };
+
+  const handleCancel = async () => {
+    setImagePreview(null);
+    onCancel();
+  };
+
   return (
-    <Dialog open={open} onClose={onCancel}>
+    <Dialog open={open} onClose={handleCancel}>
       <DialogTitle>
         {DASHBOARD.CREATE_DIALOG.TITLE} {collection?.slice(0, -1)}
       </DialogTitle>
       <DialogContent>
         {columnData?.map((col: any) => {
           const { field, headerName, type, options, multiple } = col;
-          if (field === "actions" || field === "id" || field === "chef_name")
+          if (
+            field === "actions" ||
+            field === "id" ||
+            field === "chef_name" ||
+            field === "img"
+          )
             return null;
           const value = newRowData[field] || [];
           const isList = col.type === "list";
-
           return isList ? (
             <FormControl fullWidth margin="normal" key={field}>
               <InputLabel>{headerName}</InputLabel>
@@ -82,15 +128,15 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
               >
                 {options.map((option: any) => (
                   <MenuItem key={option.id} value={option.id}>
-                  {multiple ? (
-                    <>
-                      <Checkbox checked={value.includes(option.id)} />
+                    {multiple ? (
+                      <>
+                        <Checkbox checked={value.includes(option.id)} />
+                        <ListItemText primary={option.name} />
+                      </>
+                    ) : (
                       <ListItemText primary={option.name} />
-                    </>
-                  ) : (
-                    <ListItemText primary={option.name} />
-                  )}
-                </MenuItem>
+                    )}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -107,12 +153,29 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
             />
           );
         })}
+
+        <div style={{ marginTop: "16px" }}>
+          <input type="file" onChange={handleImageChange} />
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            imagePreview && (
+              <div>
+                <img
+                  src={imagePreview}
+                  alt="Image preview"
+                  style={{ maxWidth: "100px", marginTop: "8px" }}
+                />
+              </div>
+            )
+          )}
+        </div>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel} color="primary">
+        <Button onClick={handleCancel} color="primary">
           {DASHBOARD.CREATE_DIALOG.CANCEL}
         </Button>
-        <Button onClick={onSave} color="primary" disabled={!isFormValid}>
+        <Button onClick={handleSave} color="primary" disabled={!isFormValid}>
           {DASHBOARD.CREATE_DIALOG.CREATE}
         </Button>
       </DialogActions>
