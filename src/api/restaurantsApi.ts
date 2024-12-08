@@ -13,7 +13,7 @@ export const fetchRestaurants = async () => {
       data.map(async (restaurant: RestaurantInterface) => {
         const dishesForRestaurant = await Promise.all(
           restaurant.dishes.map(async (dishId: string) => {
-            const dishName = await getDishName(dishId) || "";
+            const dishName = (await getDishName(dishId)) || "";
             return {
               id: dishId,
               name: dishName,
@@ -97,7 +97,6 @@ export const deleteRestaurant = async (id: string) => {
 
 export const updateRestaurant = async (restaurantData: RestaurantInterface) => {
   try {
-    console.log("here", restaurantData);
     const response = await fetch(
       `/api/restaurants/update/${restaurantData.id}`,
       {
@@ -116,8 +115,6 @@ export const updateRestaurant = async (restaurantData: RestaurantInterface) => {
       data.id = data._id;
       data._id = undefined;
     }
-
-    console.log("data", data);
 
     return data;
   } catch (error) {

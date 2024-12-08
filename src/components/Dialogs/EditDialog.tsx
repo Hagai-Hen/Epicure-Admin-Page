@@ -46,7 +46,7 @@ const EditDialog: React.FC<EditDialogProps> = ({
           const { field, headerName, type, options, multiple } = col;
           if (field === "actions" || field === "id" || field === "chef_name")
             return null;
-          const value = editedRowData[field] || (multiple ? [] : "");;
+          const value = editedRowData[field] || (multiple ? [] : "");
           const isList = col.type === "list";
           return isList ? (
             <FormControl fullWidth margin="normal" key={field}>
@@ -55,7 +55,7 @@ const EditDialog: React.FC<EditDialogProps> = ({
                 multiple={multiple}
                 name={field}
                 value={value}
-                onChange={onFieldChange} // Call onFieldChange to update the state
+                onChange={onFieldChange}
                 label={headerName}
               >
                 {options.map((option: any) => (

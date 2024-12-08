@@ -159,7 +159,7 @@ export const Dashboard = ({
   const handleSaveEdit = useCallback(() => {
     const editedDishes = editedRowData?.dishes?.filter(
       (dish: { id: string; name?: string }) => {
-        if (dish.id && dish.name) {
+        if (dish.id || dish.name) {
           return false;
         }
         return true;
@@ -168,13 +168,12 @@ export const Dashboard = ({
 
     const editedRests = editedRowData?.restaurants?.filter(
       (dish: { id: string; name?: string }) => {
-        if (dish.id && dish.name) {
+        if (dish.id || dish.name) {
           return false;
         }
         return true;
       }
     );
-    console.log("edited", editedRowData);
     const editedData = { ...editedRowData, dishes: editedDishes, restaurants: editedRests, restaurant: editedRowData.restaurant?.id ? editedRowData.restaurant.id : editedRowData.restaurant};
     setEditingRow(null);
     dispatch(actions.updateAction(editedData));
