@@ -43,7 +43,7 @@ interface RowData {
   id: string;
   dishes?: { id: string; name?: string }[];
   restaurants?: { id: string; name?: string }[];
-  restaurant?: {id: string};
+  restaurant?: { id: string };
 }
 
 export const Dashboard = ({
@@ -74,7 +74,7 @@ export const Dashboard = ({
       return acc;
     }, {});
   }, [columnData]);
-  
+
   const [newRowData, setNewRowData] = useState<any>(newRowDataInitial);
 
   const { collection } = useParams<{ collection: string }>();
@@ -159,7 +159,19 @@ export const Dashboard = ({
   );
 
   const handleSaveEdit = useCallback(() => {
-    const editedDishes = editedRowData?.dishes?.filter(
+    let editedDishes = editedRowData?.dishes?.filter(
+      (dish: { id: string; name?: string }) => {
+        if (dish.id || dish.name) {
+          return false;
+        }
+        return true;
+      }
+    );
+    if (editedDishes?.length === 0) {
+      editedDishes = editedRowData?.dishes?.map((dish) => dish.id);
+    }
+
+    let editedRests = editedRowData?.restaurants?.filter(
       (dish: { id: string; name?: string }) => {
         if (dish.id || dish.name) {
           return false;
@@ -168,15 +180,17 @@ export const Dashboard = ({
       }
     );
 
-    const editedRests = editedRowData?.restaurants?.filter(
-      (dish: { id: string; name?: string }) => {
-        if (dish.id || dish.name) {
-          return false;
-        }
-        return true;
-      }
-    );
-    const editedData = { ...editedRowData, dishes: editedDishes, restaurants: editedRests, restaurant: editedRowData.restaurant?.id ? editedRowData.restaurant.id : editedRowData.restaurant};
+    if (editedRests?.length === 0) {
+      editedRests = editedRowData?.restaurants?.map((rest) => rest.id);
+    }
+    const editedData = {
+      ...editedRowData,
+      dishes: editedDishes,
+      restaurants: editedRests,
+      restaurant: editedRowData.restaurant?.id
+        ? editedRowData.restaurant.id
+        : editedRowData.restaurant,
+    };
     setEditingRow(null);
     dispatch(actions.updateAction(editedData));
   }, [rowsData, editingRow, editedRowData]);
