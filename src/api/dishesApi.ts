@@ -50,11 +50,9 @@ export const deleteDish = async (id: string) => {
       },
     });
     const data = await response.json();
-    if (data._id) {
-      data.id = data._id;
-      data._id = undefined;
+    if (data.id) {
+      data._id = data.id;
     }
-
     return data;
   } catch (error) {
     console.error("Error deleting dish:", error);

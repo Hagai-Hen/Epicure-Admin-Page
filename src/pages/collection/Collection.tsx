@@ -4,30 +4,6 @@ import { Dashboard } from "../../components/Dashboard/Dashboard";
 import { COLLECTIONS, COLLECTIONS_DATA } from "../../resources/content";
 
 import {
-  setChefs,
-  CreateChef,
-  UpdateChef,
-  DeleteChef,
-  getChefs,
-} from "../../redux/slices/chefsSlice";
-
-import {
-  setRestaurants,
-  UpdateRestaurant,
-  DeleteRestaurant,
-  getRestaurants,
-  CreateRestaurant,
-} from "../../redux/slices/restaurantsSlice";
-
-import {
-  setDishes,
-  CreateDish,
-  UpdateDish,
-  DeleteDish,
-  getDishes,
-} from "../../redux/slices/dishesSlice";
-
-import {
   getCollection,
   createCollectionItem,
   deleteCollectionItem,
@@ -67,19 +43,12 @@ function CollectionPage({
     COLLECTIONS_DATA[collection.toUpperCase() as keyof typeof COLLECTIONS_DATA];
 
   useEffect(() => {
-    dispatch(getCollection(collection.toLowerCase()));
-  }, [collection, actions.deleteAction]);
+    dispatch(actions.getAction(collection.toLowerCase()));
+  }, [collection, dispatch]);
 
-  const data = useSelector((state: any) => {
-    state.collections[collection.toLowerCase()].items;
-    console.log(state.collections);
-  });
-
-  useEffect(() => {
-    if (!data || data.length === 0) {
-      dispatch(actions.setAction());
-    }
-  }, [data, dispatch, actions.setAction]);
+  const data = useSelector(
+    (state: any) => state.collections[collection.toLowerCase()]?.items
+  );
 
   const columns = collectionData.columns;
 

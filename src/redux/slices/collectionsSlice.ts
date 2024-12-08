@@ -5,7 +5,9 @@ import {
   deleteRestaurant,
   updateRestaurant,
 } from "../../api/restaurantsApi";
-import { RestaurantInterface } from "../../constants/interfaces";
+import { ChefInterface, DishInterface, RestaurantInterface } from "../../constants/interfaces";
+import { createDish, deleteDish, fetchDishes, updateDish } from "../../api/dishesApi";
+import { createChef, deleteChef, fetchChefs, updateChef } from "../../api/chefsApi";
 
 interface Item {
   id: string;
@@ -135,21 +137,30 @@ const collectionsSlice = createSlice({
 export const getCollection = createAsyncThunk(
   "collections/get",
   async (collection: string) => {
-    console.log("here", collection);
-    // This should fetch the collection data (replace with your API call)
     if (collection === "restaurants") {
       return { collection, data: await fetchRestaurants() };
     }
-    return { collection, data: [] }; // Adjust for other collections
+    if (collection === "chefs") {
+      return { collection, data: await fetchChefs() };
+    }
+    if (collection === "dishes") {
+      return { collection, data: await fetchDishes() };
+    }
+    return { collection, data: [] };
   }
 );
 
 export const createCollectionItem = createAsyncThunk(
   "collections/create",
-  async ({ collection, item }: { collection: string; item: Item }) => {
-    // Replace with actual API calls for different collections
+  async ({ collection, item }: { collection: string; item: any }) => {
     if (collection === "restaurants") {
-      return { collection, item: await createRestaurant(item as any) };
+      return { collection, item: await createRestaurant(item as RestaurantInterface) };
+    }
+    if (collection === "chefs") {
+      return { collection, item: await createChef(item as ChefInterface) };
+    }
+    if (collection === "dishes") {
+      return { collection, item: await createDish(item as DishInterface) };
     }
     return { collection, item };
   }
@@ -158,9 +169,14 @@ export const createCollectionItem = createAsyncThunk(
 export const deleteCollectionItem = createAsyncThunk(
   "collections/delete",
   async ({ collection, id }: { collection: string; id: string }) => {
-    // Replace with actual API calls for different collections
     if (collection === "restaurants") {
       await deleteRestaurant(id);
+    }
+    if (collection === "chefs") {
+      return { collection, item: await deleteChef(id) };
+    }
+    if (collection === "dishes") {
+      return { collection, item: await deleteDish(id) };
     }
     return { collection, id };
   }
@@ -169,9 +185,14 @@ export const deleteCollectionItem = createAsyncThunk(
 export const updateCollectionItem = createAsyncThunk(
   "collections/update",
   async ({ collection, item }: { collection: string; item: Item }) => {
-    // Replace with actual API calls for different collections
     if (collection === "restaurants") {
       return { collection, item: await updateRestaurant(item as RestaurantInterface) };
+    }
+    if (collection === "chefs") {
+      return { collection, item: await updateChef(item as ChefInterface) };
+    }
+    if (collection === "dishes") {
+      return { collection, item: await updateDish(item as DishInterface) };
     }
     return { collection, item };
   }
