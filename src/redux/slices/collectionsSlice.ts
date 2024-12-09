@@ -4,6 +4,7 @@ import {
   deleteItem,
   editItem,
   fetchData,
+  fetchDataPage,
 } from "../../api/collectionApi";
 
 interface Item {
@@ -20,11 +21,21 @@ interface CollectionsState {
     items: Item[];
     loading: boolean;
     error: string | null;
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalItems: number;
+    };
   };
 }
 
 const initialState: CollectionsState = {
-  restaurants: { items: [{ id: "" }], loading: false, error: null },
+  restaurants: {
+    items: [{ id: "" }],
+    loading: false,
+    error: null,
+    pagination: { currentPage: 1, totalPages: 1, totalItems: 0 },
+  },
 };
 
 const collectionsSlice = createSlice({
@@ -73,7 +84,7 @@ const collectionsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getCollection.pending, (state, action) => {
-        const collection = action.meta.arg;
+        const collection = action.meta.arg.collection;
         state[collection] = {
           ...state[collection],
           loading: true,
@@ -81,15 +92,16 @@ const collectionsSlice = createSlice({
         };
       })
       .addCase(getCollection.fulfilled, (state, action) => {
-        const { collection, data } = action.payload;
+        const { collection, data, pagination } = action.payload;
         state[collection] = {
           ...state[collection],
           items: data,
+          pagination: pagination,
           loading: false,
         };
       })
       .addCase(getCollection.rejected, (state, action) => {
-        const collection = action.meta.arg;
+        const collection = action.meta.arg.collection;
         state[collection] = {
           ...state[collection],
           loading: false,
@@ -127,7 +139,7 @@ const collectionsSlice = createSlice({
       })
       .addCase(deleteCollectionItem.fulfilled, (state, action) => {
         const { collection, item } = action.payload;
-        const {id} = item;
+        const { id } = item;
         state[collection].items = state[collection].items.filter(
           (item) => item.id !== id
         );
@@ -172,8 +184,17 @@ const collectionsSlice = createSlice({
 
 export const getCollection = createAsyncThunk(
   "collections/get",
-  async (collection: string) => {
-    return { collection, data: await fetchData(collection) };
+  async ({
+    collection,
+    page,
+    limit,
+  }: {
+    collection: string;
+    page: number;
+    limit: number;
+  }) => {
+    const data = await fetchDataPage(collection, page, limit);
+    return { collection, data: data.data, pagination: data.pagination };
   }
 );
 

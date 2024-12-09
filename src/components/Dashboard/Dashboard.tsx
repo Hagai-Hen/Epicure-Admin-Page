@@ -7,7 +7,7 @@ import CreateDialog from "../Dialogs/CreateDialog";
 import EditDialog from "../Dialogs/EditDialog";
 import DeleteDialog from "../Dialogs/DeleteDialog";
 import { GridColDef } from "@mui/x-data-grid";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   CustomPaper,
   DashboardContainer,
@@ -22,6 +22,7 @@ import {
   DashboardHeaderEntries,
 } from "./styles";
 import { UnknownAction } from "@reduxjs/toolkit";
+import { fetchDataPage } from "../../api/collectionApi";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
@@ -46,7 +47,7 @@ interface RowData {
 }
 
 export const Dashboard = ({
-  data,
+  // data,
   setActivePage,
   columnData,
   actions,
@@ -56,14 +57,19 @@ export const Dashboard = ({
 
   const [editingRow, setEditingRow] = useState<RowData | null>(null);
   const [editedRowData, setEditedRowData] = useState<RowData>({ id: "" });
-  const [rowsData, setRowsData] = useState<RowData[]>(data);
+  const [rowsData, setRowsData] = useState<RowData[]>();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEditFormValid, setIsEditFormValid] = useState(true);
+  const [data, setData] = useState([]);
 
-  const paginationModel = { page: 0, pageSize: 5 };
+  // Pagination state
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0, // Starting page (default is 0)
+    pageSize: 5, // Default number of rows per page
+  });
 
   const newRowDataInitial = useMemo(() => {
     return columnData.reduce((acc: any, col: Column) => {
@@ -80,6 +86,10 @@ export const Dashboard = ({
   let displayName = "";
   if (collection)
     displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
+
+  const pagination = useSelector(
+    (state) => state.collections[collection?.toLowerCase()].pagination
+  );
 
   useEffect(() => {
     setActivePage(collection || "");
@@ -233,6 +243,21 @@ export const Dashboard = ({
     navigate(-1);
   }, [navigate]);
 
+  const fetchDataForPage = async (page: number) => {
+
+    const fetchData = await fetchDataPage(
+      collection?.toLowerCase() || "",
+      page + 1,
+      paginationModel.pageSize
+    );
+    setData(fetchData.data);
+  };
+
+
+  useEffect(() => {
+    fetchDataForPage(paginationModel.page);
+  }, [paginationModel.page, paginationModel.pageSize]);
+
   const updatedColumns = columnData
     .filter((col) => col.field !== "chef")
     .map((col) => {
@@ -262,7 +287,7 @@ export const Dashboard = ({
             </DashboardBackContainer>
             <DashboardHeaderTitle>{displayName}</DashboardHeaderTitle>
             <DashboardHeaderEntries>
-              {rowsData?.length} {DASHBOARD.HEADER.ENTRIES}
+              {pagination.totalItems} {DASHBOARD.HEADER.ENTRIES}
             </DashboardHeaderEntries>
           </DashboardLeftHeader>
           <DashboardRightHeader>
@@ -273,15 +298,18 @@ export const Dashboard = ({
         </DashboardHeaderContainer>
         <CustomPaper>
           <DataGrid
-            rows={rowsData}
-            columns={updatedColumns}
-            initialState={{ pagination: { paginationModel } }}
-            pageSizeOptions={[5, 10]}
+            rows={data} // Data rows to display
+            columns={updatedColumns} // Columns configuration
+            pagination
+            paginationMode="server" // Enable server-side pagination
+            rowCount={pagination.totalItems} // Total number of rows (for pagination calculation)
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
           />
         </CustomPaper>
       </DashboardContainer>
 
-      <CreateDialog
+      {/* <CreateDialog
         open={openCreateDialog}
         newRowData={newRowData}
         columnData={columnData}
@@ -302,7 +330,7 @@ export const Dashboard = ({
         onSave={handleSaveEdit}
         onCancel={handleCancelEdit}
         collection={collection}
-      />
+      /> */}
 
       <DeleteDialog
         open={openDeleteDialog}
