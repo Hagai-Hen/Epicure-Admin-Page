@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
 import { uploadImageToCloudinary } from "../../api/uploadApi";
-import { DialogImg } from "../Dashboard/styles";
+import { DialogImg, UploadButton, UploadInput } from "../Dashboard/styles";
 
 interface CreateDialogProps {
   open: boolean;
@@ -51,7 +51,8 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
       if (
         col.field !== "actions" &&
         col.field !== "id" &&
-        col.field !== "chef_name"
+        col.field !== "chef_name" &&
+        col.field !== "dishes"
       ) {
         acc[col.field] = [];
       }
@@ -156,7 +157,15 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
         })}
 
         <>
-          <input type="file" onChange={handleImageChange} />
+        <UploadButton htmlFor="file-upload">
+            {DASHBOARD.EDIT_DIALOG.CHOOSE}
+          </UploadButton>
+
+          <UploadInput
+            type="file"
+            id="file-upload"
+            onChange={handleImageChange}
+          />
           {loading ? (
             <CircularProgress />
           ) : (

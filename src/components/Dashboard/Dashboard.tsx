@@ -95,9 +95,9 @@ export const Dashboard = ({
       const updatedRowData = { ...newRowData, [name]: value };
       setNewRowData(updatedRowData);
       const isValid = Object.values(updatedRowData).every((val) => {
-        if (Array.isArray(val)) {
-          return val.length > 0;
-        }
+        // if (Array.isArray(val)) {
+        //   return val.length > 0;
+        // }
         return val !== "";
       });
       setIsFormValid(isValid);
@@ -163,7 +163,12 @@ export const Dashboard = ({
       const { name, value } = e.target;
       setEditedRowData((prev: any) => {
         const updated = { ...prev, [name]: value };
-        const isValid = Object.values(updated).every((val) => val !== "");
+        const isValid = Object.values(updated).every((val) => {
+          // if (Array.isArray(val)) {
+          //   return val.length > 0;
+          // }
+          return val !== "";
+        });
         setIsEditFormValid(isValid);
         return updated;
       });

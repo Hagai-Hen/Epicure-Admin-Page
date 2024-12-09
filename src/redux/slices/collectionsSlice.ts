@@ -128,7 +128,6 @@ const collectionsSlice = createSlice({
       .addCase(deleteCollectionItem.fulfilled, (state, action) => {
         const { collection, item } = action.payload;
         const {id} = item;
-        console.log(id);
         state[collection].items = state[collection].items.filter(
           (item) => item.id !== id
         );

@@ -15,8 +15,8 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
-import { uploadImageToCloudinary } from '../../api/uploadApi';
-import { DialogImg } from "../Dashboard/styles";
+import { uploadImageToCloudinary } from "../../api/uploadApi";
+import { DialogImg, UploadButton, UploadInput } from "../Dashboard/styles";
 
 interface EditDialogProps {
   open: boolean;
@@ -39,14 +39,12 @@ const EditDialog: React.FC<EditDialogProps> = ({
   onCancel,
   collection,
 }) => {
-  const [imagePreview, setImagePreview] = useState<string | null>(null); // For showing image preview
-  const [isLoading, setIsLoading] = useState(false); // For showing the loading spinner
-
   useEffect(() => {
-    if (editedRowData.img) {
-      setImagePreview(editedRowData.img);
-    }
-  }, [open, editedRowData]);
+    setImagePreview(editedRowData.img);
+  }, [editedRowData]);
+
+  const [imagePreview, setImagePreview] = useState<string | null>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -132,7 +130,15 @@ const EditDialog: React.FC<EditDialogProps> = ({
         })}
 
         <>
-          <input type="file" onChange={handleImageChange} />
+          <UploadButton htmlFor="file-upload">
+            {DASHBOARD.EDIT_DIALOG.CHOOSE}
+          </UploadButton>
+
+          <UploadInput
+            type="file"
+            id="file-upload"
+            onChange={handleImageChange}
+          />
           {imagePreview && (
             <div>
               <DialogImg

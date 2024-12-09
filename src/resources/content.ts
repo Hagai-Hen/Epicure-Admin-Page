@@ -20,6 +20,7 @@ export const DASHBOARD = {
     TITLE: "Edit",
     CANCEL: "Cancel",
     SAVE: "Save",
+    CHOOSE: "Choose Image",
   },
   DELETE_DIALOG: {
     TITLE: "Are you sure you want to delete?",
