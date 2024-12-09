@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
-import { uploadImageToCloudinary } from "../../api/uploadApi";
+import { uploadImageToCloudinary } from '../../api/uploadApi';
 import { DialogImg } from "../Dashboard/styles";
 
 interface EditDialogProps {

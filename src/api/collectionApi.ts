@@ -97,6 +97,8 @@ export const deleteItem = async (collection: string, id: string) => {
       data._id = undefined;
     }
 
+    console.log("data", data)
+
     return data;
   } catch (error) {
     console.error(`Error deleting ${collection}:`, error);
