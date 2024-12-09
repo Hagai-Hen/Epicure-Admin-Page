@@ -1,6 +1,5 @@
-import { fetchChefs } from "../api/chefsApi";
-import { fetchDishes } from "../api/dishesApi";
-import { fetchRestaurants } from "../api/restaurantsApi";
+import { fetchData } from "../api/collectionApi";
+
 import {
   renderImgCell,
   renderActionsCell,
@@ -56,7 +55,7 @@ export const COLLECTIONS_DATA = {
         field: "chef",
         headerName: "Chef",
         type: "list",
-        options: await fetchChefs().then((chefs) =>
+        options: await fetchData("chefs").then((chefs) =>
           chefs?.map((chef) => ({
             id: chef.id,
             name: chef.name,
@@ -78,7 +77,7 @@ export const COLLECTIONS_DATA = {
         field: "dishes",
         headerName: "Dishes",
         type: "list",
-        options: await fetchDishes().then((dishes) =>
+        options: await fetchData("dishes").then((dishes) =>
           dishes?.map((dish) => ({
             id: dish.id,
             name: dish.name,
@@ -115,7 +114,7 @@ export const COLLECTIONS_DATA = {
         field: "restaurants",
         headerName: "Restaurants",
         type: "list",
-        options: await fetchRestaurants().then((restaurants) =>
+        options: await fetchData("restaurants").then((restaurants) =>
           restaurants?.map((restaurant) => ({
             id: restaurant.id,
             name: restaurant.name,
@@ -157,7 +156,7 @@ export const COLLECTIONS_DATA = {
         field: "restaurant",
         headerName: "Restaurant",
         type: "list",
-        options: await fetchRestaurants().then((restaurants) =>
+        options: await fetchData("restaurants").then((restaurants) =>
           restaurants?.map((restaurant) => ({
             id: restaurant.id,
             name: restaurant.name,

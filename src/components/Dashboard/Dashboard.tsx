@@ -32,9 +32,9 @@ interface DashboardProps {
   setActivePage: (page: string) => void;
   columnData: Column[];
   actions: {
-    createAction: (params: { collection: string, item: any }) => UnknownAction;
-    updateAction: (params: { collection: string, item: any }) => UnknownAction;
-    deleteAction: (params: { collection: string, id: string }) => UnknownAction;
+    createAction: (params: { collection: string; item: any }) => UnknownAction;
+    updateAction: (params: { collection: string; item: any }) => UnknownAction;
+    deleteAction: (params: { collection: string; id: string }) => UnknownAction;
     getAction: (collection: string) => UnknownAction;
   };
 }
@@ -42,7 +42,7 @@ interface RowData {
   id: string;
   dishes?: { id: string; name?: string }[];
   restaurants?: { id: string; name?: string }[];
-  restaurant?: {id: string};
+  restaurant?: { id: string };
 }
 
 export const Dashboard = ({
@@ -169,23 +169,20 @@ export const Dashboard = ({
 
   const handleSaveEdit = useCallback(() => {
     const editedDishes = editedRowData?.dishes?.filter(
-      (dish: { id: string; name?: string }) => {
-        if (dish.id || dish.name) {
-          return false;
-        }
-        return true;
-      }
+      (dish: { id: string; name?: string }) => dish.id || dish.name
     );
 
     const editedRests = editedRowData?.restaurants?.filter(
-      (dish: { id: string; name?: string }) => {
-        if (dish.id || dish.name) {
-          return false;
-        }
-        return true;
-      }
+      (rest: { id: string; name?: string }) => rest.id || rest.name
     );
-    const editedData = { ...editedRowData, dishes: editedDishes, restaurants: editedRests, restaurant: editedRowData.restaurant?.id ? editedRowData.restaurant.id : editedRowData.restaurant};
+    const editedData = {
+      ...editedRowData,
+      dishes: editedDishes,
+      restaurants: editedRests,
+      restaurant: editedRowData.restaurant?.id
+        ? editedRowData.restaurant.id
+        : editedRowData.restaurant,
+    };
     setEditingRow(null);
     dispatch(
       actions.updateAction({
