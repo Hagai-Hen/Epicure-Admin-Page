@@ -16,7 +16,7 @@ const collectionToActionsMap: Record<string, any> = {
   createAction: createCollectionItem,
   deleteAction: deleteCollectionItem,
   updateAction: updateCollectionItem,
-  setCollectionData: setCollectionData,
+  setCollectionData: setCollectionData
 };
 
 function CollectionPage({
@@ -71,6 +71,8 @@ function CollectionPage({
 
   // Get column data for the collection
   const columns = collectionData.columns;
+
+  // console.log("data^^^", data);
 
   return (
     <Dashboard

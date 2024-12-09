@@ -102,6 +102,16 @@ export const Dashboard = ({
     (state) => state.collections[collection?.toLowerCase()].pagination
   );
 
+  // useEffect(() => {
+  //   dispatch(
+  //     actions.getAction({
+  //       collection: collection?.toLowerCase(),
+  //       page: paginationModel.page,
+  //       limit: paginationModel.pageSize,
+  //     })
+  //   );
+  // }, [paginationModel, collection, dispatch]);
+
   useEffect(() => {
     setActivePage(collection || "");
   }, [collection]);
@@ -136,9 +146,13 @@ export const Dashboard = ({
         item: newRowData,
       })
     );
-    setTimeout(() => {
-      dispatch(actions.getAction(collection?.toLowerCase() || ""));
-    }, 500);
+    dispatch(
+      actions.getAction({
+        collection: collection?.toLowerCase(),
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      })
+    );
     setOpenCreateDialog(false);
     setIsFormValid(false);
   }, [rowsData, newRowData]);
@@ -152,8 +166,10 @@ export const Dashboard = ({
   const handleDelete = useCallback(
     (id: string) => {
       const row = rowsData.find((row) => row.id === id);
-      if (row) setRowToDelete(row);
-      setOpenDeleteDialog(true);
+      if (row) {
+        setRowToDelete(row);
+        setOpenDeleteDialog(true);
+      }
     },
     [rowsData]
   );
@@ -169,10 +185,6 @@ export const Dashboard = ({
       setData((prevData) => {
         return prevData.filter((item) => item.id !== rowToDelete.id);
       });
-
-      setRowsData((prevRowsData) => {
-        return prevRowsData.filter((item) => item.id !== rowToDelete.id);
-      });
       dispatch(
         actions.getAction({
           collection: collection?.toLowerCase(),
@@ -183,7 +195,13 @@ export const Dashboard = ({
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
-  }, [rowToDelete]);
+  }, [
+    rowToDelete,
+    collection,
+    paginationModel.page,
+    paginationModel.pageSize,
+    dispatch,
+  ]);
 
   const cancelDelete = useCallback(() => {
     setRowToDelete(null);
@@ -247,13 +265,6 @@ export const Dashboard = ({
         : editedRowData.restaurant,
     };
     setEditingRow(null);
-    dispatch(
-      actions.updateAction({
-        collection: collection?.toLowerCase() || "",
-        item: editedData,
-      })
-    );
-
     setData((prevData) => {
       const index = prevData.findIndex(
         (item: { id: string }) => item.id === editedData.id
@@ -266,17 +277,12 @@ export const Dashboard = ({
       return prevData;
     });
 
-    setRowsData((prevRowsData) => {
-      const index = prevRowsData.findIndex(
-        (item: { id: string }) => item.id === editedData.id
-      );
-      if (index !== -1) {
-        const updatedRowsData = [...prevRowsData];
-        updatedRowsData[index] = editedData;
-        return updatedRowsData;
-      }
-      return prevRowsData;
-    });
+    dispatch(
+      actions.updateAction({
+        collection: collection?.toLowerCase() || "",
+        item: editedData,
+      })
+    );
 
     dispatch(
       actions.getAction({
@@ -285,7 +291,9 @@ export const Dashboard = ({
         limit: paginationModel.pageSize,
       })
     );
-  }, [rowsData, editingRow, editedRowData]);
+    console.log(editedData);
+    console.log(rowsData);
+  }, [editedRowData, collection, paginationModel, dispatch]);
 
   const handleCancelEdit = useCallback(() => {
     setEditingRow(null);
@@ -330,13 +338,6 @@ export const Dashboard = ({
         paginationModel.page * paginationModel.pageSize,
         (paginationModel.page + 1) * paginationModel.pageSize
       )
-    );
-
-    dispatch(
-      actions.setCollectionData({
-        collection: collection?.toLowerCase() || "",
-        data: data,
-      })
     );
 
     setLoadedPages((prev) => new Set(prev).add(page));
