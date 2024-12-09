@@ -33,10 +33,22 @@ interface DashboardProps {
   setActivePage: (page: string) => void;
   columnData: Column[];
   actions: {
-    createAction: (params: { collection: string; item: any }) => UnknownAction;
+    createAction: (params: {
+      collection: string;
+      page: string;
+      limit: string;
+    }) => UnknownAction;
     updateAction: (params: { collection: string; item: any }) => UnknownAction;
     deleteAction: (params: { collection: string; id: string }) => UnknownAction;
-    getAction: (collection: string) => UnknownAction;
+    getAction: (params: {
+      collection?: string;
+      page: number;
+      limit: number;
+    }) => UnknownAction;
+    setCollectionData: (params: {
+      collection: string;
+      data: any;
+    }) => UnknownAction;
   };
 }
 interface RowData {
@@ -65,10 +77,9 @@ export const Dashboard = ({
   const [isEditFormValid, setIsEditFormValid] = useState(true);
   const [data, setData] = useState([]);
 
-  // Pagination state
   const [paginationModel, setPaginationModel] = useState({
-    page: 0, // Starting page (default is 0)
-    pageSize: 5, // Default number of rows per page
+    page: 0,
+    pageSize: 5,
   });
 
   const newRowDataInitial = useMemo(() => {
@@ -93,8 +104,7 @@ export const Dashboard = ({
 
   useEffect(() => {
     setActivePage(collection || "");
-    setRowsData(data);
-  }, [collection, data]);
+  }, [collection]);
 
   const handleCreateDialogOpen = useCallback(() => {
     setOpenCreateDialog(true);
@@ -156,7 +166,20 @@ export const Dashboard = ({
           id: rowToDelete.id,
         })
       );
-      // dispatch(actions.getAction(collection?.toLowerCase() || ""));
+      setData((prevData) => {
+        return prevData.filter((item) => item.id !== rowToDelete.id);
+      });
+
+      setRowsData((prevRowsData) => {
+        return prevRowsData.filter((item) => item.id !== rowToDelete.id);
+      });
+      dispatch(
+        actions.getAction({
+          collection: collection?.toLowerCase(),
+          page: paginationModel.page,
+          limit: paginationModel.pageSize,
+        })
+      );
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
@@ -230,9 +253,38 @@ export const Dashboard = ({
         item: editedData,
       })
     );
-    setTimeout(() => {
-      dispatch(actions.getAction(collection?.toLowerCase() || ""));
-    }, 500);
+
+    setData((prevData) => {
+      const index = prevData.findIndex(
+        (item: { id: string }) => item.id === editedData.id
+      );
+      if (index !== -1) {
+        const updatedData = [...prevData];
+        updatedData[index] = editedData;
+        return updatedData;
+      }
+      return prevData;
+    });
+
+    setRowsData((prevRowsData) => {
+      const index = prevRowsData.findIndex(
+        (item: { id: string }) => item.id === editedData.id
+      );
+      if (index !== -1) {
+        const updatedRowsData = [...prevRowsData];
+        updatedRowsData[index] = editedData;
+        return updatedRowsData;
+      }
+      return prevRowsData;
+    });
+
+    dispatch(
+      actions.getAction({
+        collection: collection?.toLowerCase(),
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      })
+    );
   }, [rowsData, editingRow, editedRowData]);
 
   const handleCancelEdit = useCallback(() => {
@@ -243,20 +295,56 @@ export const Dashboard = ({
     navigate(-1);
   }, [navigate]);
 
+  const [loadedPages, setLoadedPages] = useState<Set<number>>(new Set()); // To track loaded pages
+
+  // Effect for fetching data
   const fetchDataForPage = async (page: number) => {
+    if (loadedPages.has(page)) {
+      setRowsData(
+        data.slice(
+          paginationModel.page * paginationModel.pageSize,
+          (paginationModel.page + 1) * paginationModel.pageSize
+        )
+      );
+      return;
+    }
 
     const fetchData = await fetchDataPage(
       collection?.toLowerCase() || "",
       page + 1,
       paginationModel.pageSize
     );
-    setData(fetchData.data);
-  };
 
+    console.log("Fetched data for page", page + 1, fetchData.data);
+
+    setData((prevData) => {
+      const existingIds = new Set(prevData.map((item) => item.id));
+      const newItems = fetchData?.data.filter(
+        (item) => !existingIds.has(item.id)
+      );
+      return [...prevData, ...(newItems || "")];
+    });
+
+    setRowsData(
+      data.slice(
+        paginationModel.page * paginationModel.pageSize,
+        (paginationModel.page + 1) * paginationModel.pageSize
+      )
+    );
+
+    dispatch(
+      actions.setCollectionData({
+        collection: collection?.toLowerCase() || "",
+        data: data,
+      })
+    );
+
+    setLoadedPages((prev) => new Set(prev).add(page));
+  };
 
   useEffect(() => {
     fetchDataForPage(paginationModel.page);
-  }, [paginationModel.page, paginationModel.pageSize]);
+  }, [paginationModel.page, paginationModel.pageSize, data]);
 
   const updatedColumns = columnData
     .filter((col) => col.field !== "chef")
@@ -298,7 +386,7 @@ export const Dashboard = ({
         </DashboardHeaderContainer>
         <CustomPaper>
           <DataGrid
-            rows={data} // Data rows to display
+            rows={rowsData} // Data rows to display
             columns={updatedColumns} // Columns configuration
             pagination
             paginationMode="server" // Enable server-side pagination
@@ -309,7 +397,7 @@ export const Dashboard = ({
         </CustomPaper>
       </DashboardContainer>
 
-      {/* <CreateDialog
+      <CreateDialog
         open={openCreateDialog}
         newRowData={newRowData}
         columnData={columnData}
@@ -330,7 +418,7 @@ export const Dashboard = ({
         onSave={handleSaveEdit}
         onCancel={handleCancelEdit}
         collection={collection}
-      /> */}
+      />
 
       <DeleteDialog
         open={openDeleteDialog}

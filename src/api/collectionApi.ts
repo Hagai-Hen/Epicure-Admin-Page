@@ -120,8 +120,6 @@ export const fetchDataPage = async (
       })
     );
     return { data: transformedData, pagination: data.pagination };
-    // console.log("transform!", transformedData);
-    // return transformedData;
   } catch (error) {
     console.log(`Error getting ${collection}:`, (error as Error).message);
   }
