@@ -41,8 +41,8 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
   setNewRowData,
   collection,
 }) => {
-  const [imagePreview, setImagePreview] = useState<string | null>(null); // For showing image preview
-  const [loading, setLoading] = useState<boolean>(false); // For tracking loading state
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const initializedRowData = useMemo(() => {
     if (!open) return {};

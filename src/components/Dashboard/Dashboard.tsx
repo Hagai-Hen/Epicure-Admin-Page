@@ -92,19 +92,23 @@ export const Dashboard = ({
   const handleCreateFieldChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
+
       const updatedRowData = { ...newRowData, [name]: value };
       setNewRowData(updatedRowData);
-      const isValid = Object.values(updatedRowData).every((val) => {
-        // if (Array.isArray(val)) {
-        //   return val.length > 0;
-        // }
-        return val !== "";
-      });
+
+      const isValid = Object.entries(updatedRowData).every(
+        ([fieldName, val]) => {
+          if (Array.isArray(val) && fieldName !== "dishes") {
+            return val.length > 0;
+          } else {
+            return val !== "";
+          }
+        }
+      );
       setIsFormValid(isValid);
     },
     [newRowData]
   );
-
   const handleSaveCreate = useCallback(() => {
     dispatch(
       actions.createAction({
@@ -142,7 +146,7 @@ export const Dashboard = ({
           id: rowToDelete.id,
         })
       );
-      dispatch(actions.getAction(collection?.toLowerCase() || ""));
+      // dispatch(actions.getAction(collection?.toLowerCase() || ""));
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
