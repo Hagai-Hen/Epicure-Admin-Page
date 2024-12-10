@@ -203,7 +203,9 @@ export const Dashboard = ({
 
   const handleEdit = useCallback((row: RowData) => {
     setEditingRow(row);
-    setEditedRowData({ ...row });
+    setEditedRowData({ ...row,
+      dishes: row.dishes ? [] : row.dishes,
+      restaurants: row.restaurants ? [] : row.restaurants, });
   }, []);
 
   const handleFieldChange = useCallback(
@@ -233,39 +235,26 @@ export const Dashboard = ({
     //     return true;
     //   }
     // );
-    const editedDishes = editedRowData?.dishes
+    let editedDishes = editedRowData?.dishes
+    if (editedDishes?.length === 0) {
+      editedDishes = editingRow?.dishes;
+    }
+
+    let editedRests = editedRowData?.restaurants
       ?.filter((dish) => {
-        // Add the dish to editedDishes if it is not in editingRow.dishes, or if it exists in both
-        return (
-          !editingRow?.dishes?.some((rowDish) => rowDish.id === dish.id) ||
-          editingRow?.dishes?.some((rowDish) => rowDish.id === dish.id)
-        );
+        return !editingRow?.dishes?.some((rowDish) => rowDish.id === dish.id);
       })
       .map((dish) => ({
         id: dish.id,
         name: dish.name,
       }))
-      // Remove duplicates based on the dish id
       .filter((value, index, self) => {
         return index === self.findIndex((t) => t.id === value.id); // Ensure unique dishes by id
       });
 
-    const editedRests = editedRowData?.restaurants
-      ?.filter((rest) => {
-        // Add the dish to editedDishes if it is not in editingRow.dishes, or if it exists in both
-        return (
-          !editingRow?.restaurants?.some((rowDish) => rowDish.id === rest.id) ||
-          editingRow?.restaurants?.some((rowDish) => rowDish.id === rest.id)
-        );
-      })
-      .map((rest) => ({
-        id: rest.id,
-        name: rest.name,
-      }))
-      // Remove duplicates based on the dish id
-      .filter((value, index, self) => {
-        return index === self.findIndex((t) => t.id === value.id); // Ensure unique dishes by id
-      });
+    if (editedRests?.length === 0) {
+      editedRests = editingRow?.restaurants;
+    }
 
     // let editedRests = editedRowData?.restaurants?.filter(
     //   (dish: { id: string; name?: string }) => {
@@ -290,18 +279,17 @@ export const Dashboard = ({
     };
     setEditingRow(null);
 
-    setData((prevData) => {
-      const index = prevData.findIndex(
-        (item: { id: string }) => item.id === editedData.id
-      );
-      if (index !== -1) {
-        const updatedData = [...prevData];
-        updatedData[index] = editedData;
-        return updatedData;
-      }
-      return prevData;
-    });
-
+    // setData((prevData) => {
+    //   const index = prevData.findIndex(
+    //     (item: { id: string }) => item.id === editedData.id
+    //   );
+    //   if (index !== -1) {
+    //     const updatedData = [...prevData];
+    //     updatedData[index] = editedData;
+    //     return updatedData;
+    //   }
+    //   return prevData;
+    // });
     dispatch(
       actions.updateAction({
         collection: collection?.toLowerCase() || "",
@@ -309,15 +297,13 @@ export const Dashboard = ({
       })
     );
 
-    // setTimeout(() => {
-    //   dispatch(
-    //     actions.getAction({
-    //       collection: collection?.toLowerCase(),
-    //       page: paginationModel.page,
-    //       limit: paginationModel.pageSize,
-    //     })
-    //   );
-    // }, 500); // Delay in milliseconds (e.g., 500ms)
+    dispatch(
+      actions.getAction({
+        collection: collection?.toLowerCase(),
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      })
+    );
 
     //TODO: re-render update to store in
   }, [editedRowData, collection, paginationModel, dispatch]);
@@ -357,6 +343,12 @@ export const Dashboard = ({
   //   }
   // }, [updatedData]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setData(updatedData);
+    }, 500);
+  }, [updatedData]);
+
   const handleCancelEdit = useCallback(() => {
     setEditingRow(null);
   }, []);
@@ -379,11 +371,11 @@ export const Dashboard = ({
       return;
     }
 
-    const fetchData = await fetchDataPage(
-      collection?.toLowerCase() || "",
-      page + 1,
-      paginationModel.pageSize
-    );
+    // const fetchData = await fetchDataPage(
+    //   collection?.toLowerCase() || "",
+    //   page + 1,
+    //   paginationModel.pageSize
+    // );
 
     dispatch(
       actions.getAction({
@@ -393,15 +385,15 @@ export const Dashboard = ({
       })
     );
 
-    console.log("Fetched data for page", page + 1, fetchData.data);
+    // console.log("Fetched data for page", page + 1, fetchData.data);
 
-    setData((prevData) => {
-      const existingIds = new Set(prevData.map((item) => item.id));
-      const newItems = fetchData?.data.filter(
-        (item) => !existingIds.has(item.id)
-      );
-      return [...prevData, ...(newItems || "")];
-    });
+    // setData((prevData) => {
+    //   const existingIds = new Set(prevData.map((item) => item.id));
+    //   const newItems = fetchData?.data.filter(
+    //     (item) => !existingIds.has(item.id)
+    //   );
+    //   return [...prevData, ...(newItems || "")];
+    // });
 
     setRowsData(
       data.slice(

@@ -105,7 +105,7 @@ const EditDialog: React.FC<EditDialogProps> = ({
                   <MenuItem key={option} value={field === 'tags' ? option.id : option}>
                     {multiple ? (
                       <>
-                        <Checkbox checked={field === 'tags' ? value.includes(option.id) : value.includes(option)} />
+                        <Checkbox checked={field === 'tags' ? value.includes(option.id) : value.includes(option) }/>
                         <ListItemText primary={option.name} />
                       </>
                     ) : (
