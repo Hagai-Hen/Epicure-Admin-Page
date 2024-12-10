@@ -22,7 +22,6 @@ import {
   DashboardHeaderEntries,
 } from "./styles";
 import { UnknownAction } from "@reduxjs/toolkit";
-import { fetchDataPage } from "../../api/collectionApi";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
@@ -61,7 +60,6 @@ interface RowData {
 }
 
 export const Dashboard = ({
-  // data,
   setActivePage,
   columnData,
   actions,
@@ -106,6 +104,14 @@ export const Dashboard = ({
 
   useEffect(() => {
     setActivePage(collection || "");
+    setData([]);
+    dispatch(
+      actions.getAction({
+        collection: collection?.toLowerCase(),
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      })
+    );
   }, [collection]);
 
   const handleCreateDialogOpen = useCallback(() => {
@@ -158,7 +164,7 @@ export const Dashboard = ({
 
   const handleDelete = useCallback(
     (id: string) => {
-      const row = rowsData.find((row) => row.id === id);
+      const row = rowsData?.find((row) => row.id === id);
       if (row) {
         setRowToDelete(row);
         setOpenDeleteDialog(true);
@@ -203,9 +209,11 @@ export const Dashboard = ({
 
   const handleEdit = useCallback((row: RowData) => {
     setEditingRow(row);
-    setEditedRowData({ ...row,
+    setEditedRowData({
+      ...row,
       dishes: row.dishes ? [] : row.dishes,
-      restaurants: row.restaurants ? [] : row.restaurants, });
+      restaurants: row.restaurants ? [] : row.restaurants,
+    });
   }, []);
 
   const handleFieldChange = useCallback(
@@ -214,9 +222,6 @@ export const Dashboard = ({
       setEditedRowData((prev: any) => {
         const updated = { ...prev, [name]: value };
         const isValid = Object.values(updated).every((val) => {
-          // if (Array.isArray(val)) {
-          //   return val.length > 0;
-          // }
           return val !== "";
         });
         setIsEditFormValid(isValid);
@@ -227,69 +232,21 @@ export const Dashboard = ({
   );
 
   const handleSaveEdit = useCallback(() => {
-    // let editedDishes = editedRowData?.dishes?.filter(
-    //   (dish: { id: string; name?: string }) => {
-    //     if (dish.id || dish.name) {
-    //       return false;
-    //     }
-    //     return true;
-    //   }
-    // );
-    let editedDishes = editedRowData?.dishes
+    let editedDishes = editedRowData?.dishes;
     if (editedDishes?.length === 0) {
       editedDishes = editingRow?.dishes;
     }
 
-    let editedRests = editedRowData?.restaurants
-      ?.filter((dish) => {
-        return !editingRow?.dishes?.some((rowDish) => rowDish.id === dish.id);
-      })
-      .map((dish) => ({
-        id: dish.id,
-        name: dish.name,
-      }))
-      .filter((value, index, self) => {
-        return index === self.findIndex((t) => t.id === value.id); // Ensure unique dishes by id
-      });
-
+    let editedRests = editedRowData?.restaurants;
     if (editedRests?.length === 0) {
       editedRests = editingRow?.restaurants;
     }
-
-    // let editedRests = editedRowData?.restaurants?.filter(
-    //   (dish: { id: string; name?: string }) => {
-    //     if (dish.id || dish.name) {
-    //       return false;
-    //     }
-    //     return true;
-    //   }
-    // );
-
-    // if (editedRests?.length === 0) {
-    //   editedRests = editedRowData?.restaurants?.map((rest) => rest.id);
-    // }
     const editedData = {
       ...editedRowData,
-      // tags: editedTags,
       dishes: editedDishes,
       restaurants: editedRests,
-      // restaurant: editedRowData.restaurant?.id
-      //   ? editedRowData.restaurant.id
-      //   : editedRowData.restaurant,
     };
     setEditingRow(null);
-
-    // setData((prevData) => {
-    //   const index = prevData.findIndex(
-    //     (item: { id: string }) => item.id === editedData.id
-    //   );
-    //   if (index !== -1) {
-    //     const updatedData = [...prevData];
-    //     updatedData[index] = editedData;
-    //     return updatedData;
-    //   }
-    //   return prevData;
-    // });
     dispatch(
       actions.updateAction({
         collection: collection?.toLowerCase() || "",
@@ -304,49 +261,16 @@ export const Dashboard = ({
         limit: paginationModel.pageSize,
       })
     );
-
-    //TODO: re-render update to store in
   }, [editedRowData, collection, paginationModel, dispatch]);
 
   const { items: updatedData } = useSelector(
     (state) => state.collections[collection?.toLowerCase()] || {}
   );
 
-  // useEffect(() => {
-  //   if (updatedData) {
-  //     console.log("updatedData", updatedData);
-  //     // Update rowsData based on updatedData
-  //     setData(updatedData);
-  //     setTimeout(() => {
-  //       setRowsData((prevRowsData) => {
-  //         const updatedRows = prevRowsData?.map((row) => {
-  //           // Find the matching data by ID and update it
-  //           const updatedItem = updatedData.find((item) => item.id === row.id);
-
-  //           // If found, replace with the updated data, otherwise keep the original row
-  //           if (updatedItem) {
-  //             return { ...row, ...updatedItem };
-  //           }
-
-  //           // If no match, return the row as is
-  //           return row;
-  //         });
-
-  //         // Append new rows to the updated rowsData
-  //         return updatedRows;
-  //       });
-  //     }, 500);
-
-  //     console.log("rowsData", rowsData);
-
-  //     //todo: try to sent it from the checkbox
-  //   }
-  // }, [updatedData]);
-
   useEffect(() => {
-    setTimeout(() => {
+    if (updatedData) {
       setData(updatedData);
-    }, 500);
+    }
   }, [updatedData]);
 
   const handleCancelEdit = useCallback(() => {
@@ -357,9 +281,8 @@ export const Dashboard = ({
     navigate(-1);
   }, [navigate]);
 
-  const [loadedPages, setLoadedPages] = useState<Set<number>>(new Set()); // To track loaded pages
+  const [loadedPages, setLoadedPages] = useState<Set<number>>(new Set());
 
-  // Effect for fetching data
   const fetchDataForPage = async (page: number) => {
     if (loadedPages.has(page)) {
       setRowsData(
@@ -370,13 +293,6 @@ export const Dashboard = ({
       );
       return;
     }
-
-    // const fetchData = await fetchDataPage(
-    //   collection?.toLowerCase() || "",
-    //   page + 1,
-    //   paginationModel.pageSize
-    // );
-
     dispatch(
       actions.getAction({
         collection: collection?.toLowerCase(),
@@ -384,16 +300,6 @@ export const Dashboard = ({
         limit: paginationModel.pageSize,
       })
     );
-
-    // console.log("Fetched data for page", page + 1, fetchData.data);
-
-    // setData((prevData) => {
-    //   const existingIds = new Set(prevData.map((item) => item.id));
-    //   const newItems = fetchData?.data.filter(
-    //     (item) => !existingIds.has(item.id)
-    //   );
-    //   return [...prevData, ...(newItems || "")];
-    // });
 
     setRowsData(
       data.slice(
@@ -449,11 +355,11 @@ export const Dashboard = ({
         </DashboardHeaderContainer>
         <CustomPaper>
           <DataGrid
-            rows={rowsData} // Data rows to display
-            columns={updatedColumns} // Columns configuration
+            rows={rowsData} 
+            columns={updatedColumns}
             pagination
-            paginationMode="server" // Enable server-side pagination
-            rowCount={pagination?.totalItems} // Total number of rows (for pagination calculation)
+            paginationMode="server"
+            rowCount={pagination?.totalItems}
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
           />
