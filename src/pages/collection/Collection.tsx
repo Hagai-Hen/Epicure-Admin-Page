@@ -76,10 +76,12 @@ function CollectionPage({
 
   return (
     <Dashboard
-      // data={data}
+      data={data}
       columnData={columns}
       setActivePage={setActivePage}
       actions={actions}
+      paginationModel={paginationModel}
+      setPaginationModel={setPaginationModel}
     />
   );
 }

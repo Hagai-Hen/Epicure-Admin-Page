@@ -50,6 +50,8 @@ interface DashboardProps {
       data: any;
     }) => UnknownAction;
   };
+  paginationModel: { page: number; pageSize: number };
+  setPaginationModel: (page: number, pageSize: number) => void;
 }
 interface RowData {
   id: string;
@@ -99,18 +101,8 @@ export const Dashboard = ({
     displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
 
   const pagination = useSelector(
-    (state) => state.collections[collection?.toLowerCase()].pagination
+    (state) => state.collections[collection?.toLowerCase()]?.pagination
   );
-
-  // useEffect(() => {
-  //   dispatch(
-  //     actions.getAction({
-  //       collection: collection?.toLowerCase(),
-  //       page: paginationModel.page,
-  //       limit: paginationModel.pageSize,
-  //     })
-  //   );
-  // }, [paginationModel, collection, dispatch]);
 
   useEffect(() => {
     setActivePage(collection || "");
@@ -146,6 +138,7 @@ export const Dashboard = ({
         item: newRowData,
       })
     );
+
     dispatch(
       actions.getAction({
         collection: collection?.toLowerCase(),
@@ -265,6 +258,7 @@ export const Dashboard = ({
         : editedRowData.restaurant,
     };
     setEditingRow(null);
+
     setData((prevData) => {
       const index = prevData.findIndex(
         (item: { id: string }) => item.id === editedData.id
@@ -284,16 +278,53 @@ export const Dashboard = ({
       })
     );
 
-    dispatch(
-      actions.getAction({
-        collection: collection?.toLowerCase(),
-        page: paginationModel.page,
-        limit: paginationModel.pageSize,
-      })
-    );
-    console.log(editedData);
-    console.log(rowsData);
+    setTimeout(() => {
+      dispatch(
+        actions.getAction({
+          collection: collection?.toLowerCase(),
+          page: paginationModel.page,
+          limit: paginationModel.pageSize,
+        })
+      );
+    }, 500); // Delay in milliseconds (e.g., 500ms)
+
+    //TODO: re-render update to store in
   }, [editedRowData, collection, paginationModel, dispatch]);
+
+  const { items: updatedData } = useSelector(
+    (state) => state.collections[collection?.toLowerCase()] || {}
+  );
+
+  useEffect(() => {
+    if (updatedData) {
+      console.log("updatedData", updatedData);
+      // Update rowsData based on updatedData
+      setData(updatedData);
+      setTimeout(() => {
+        setRowsData((prevRowsData) => {
+          const updatedRows = prevRowsData?.map((row) => {
+            // Find the matching data by ID and update it
+            const updatedItem = updatedData.find((item) => item.id === row.id);
+
+            // If found, replace with the updated data, otherwise keep the original row
+            if (updatedItem) {
+              return { ...row, ...updatedItem };
+            }
+
+            // If no match, return the row as is
+            return row;
+          });
+
+          // Append new rows to the updated rowsData
+          return updatedRows;
+        });
+      }, 500);
+
+      console.log("rowsData", rowsData);
+
+      //todo: try to sent it from the checkbox
+    }
+  }, [updatedData]);
 
   const handleCancelEdit = useCallback(() => {
     setEditingRow(null);
@@ -321,6 +352,14 @@ export const Dashboard = ({
       collection?.toLowerCase() || "",
       page + 1,
       paginationModel.pageSize
+    );
+
+    dispatch(
+      actions.getAction({
+        collection: collection?.toLowerCase(),
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+      })
     );
 
     console.log("Fetched data for page", page + 1, fetchData.data);
@@ -376,7 +415,7 @@ export const Dashboard = ({
             </DashboardBackContainer>
             <DashboardHeaderTitle>{displayName}</DashboardHeaderTitle>
             <DashboardHeaderEntries>
-              {pagination.totalItems} {DASHBOARD.HEADER.ENTRIES}
+              {pagination?.totalItems} {DASHBOARD.HEADER.ENTRIES}
             </DashboardHeaderEntries>
           </DashboardLeftHeader>
           <DashboardRightHeader>
@@ -391,7 +430,7 @@ export const Dashboard = ({
             columns={updatedColumns} // Columns configuration
             pagination
             paginationMode="server" // Enable server-side pagination
-            rowCount={pagination.totalItems} // Total number of rows (for pagination calculation)
+            rowCount={pagination?.totalItems} // Total number of rows (for pagination calculation)
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
           />

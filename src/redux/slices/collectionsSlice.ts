@@ -31,7 +31,7 @@ interface CollectionsState {
 
 const initialState: CollectionsState = {
   restaurants: {
-    items: [{ id: "" }],
+    items: [],
     loading: false,
     error: null,
     pagination: { currentPage: 1, totalPages: 1, totalItems: 0 },
@@ -93,9 +93,22 @@ const collectionsSlice = createSlice({
       })
       .addCase(getCollection.fulfilled, (state, action) => {
         const { collection, data, pagination } = action.payload;
+
+        // Append new items while avoiding duplicates
+        const updatedItems = [
+          ...state[collection].items,
+          ...data.filter(
+            (newItem) =>
+              !state[collection].items.some(
+                (existingItem) => existingItem.id === newItem.id
+              )
+          ),
+        ];
+
+        // Update state with the new items and pagination
         state[collection] = {
           ...state[collection],
-          items: data,
+          items: updatedItems,
           pagination: pagination,
           loading: false,
         };
