@@ -225,37 +225,68 @@ export const Dashboard = ({
   );
 
   const handleSaveEdit = useCallback(() => {
-    let editedDishes = editedRowData?.dishes?.filter(
-      (dish: { id: string; name?: string }) => {
-        if (dish.id || dish.name) {
-          return false;
-        }
-        return true;
-      }
-    );
-    if (editedDishes?.length === 0) {
-      editedDishes = editedRowData?.dishes?.map((dish) => dish.id);
-    }
+    // let editedDishes = editedRowData?.dishes?.filter(
+    //   (dish: { id: string; name?: string }) => {
+    //     if (dish.id || dish.name) {
+    //       return false;
+    //     }
+    //     return true;
+    //   }
+    // );
+    const editedDishes = editedRowData?.dishes
+      ?.filter((dish) => {
+        // Add the dish to editedDishes if it is not in editingRow.dishes, or if it exists in both
+        return (
+          !editingRow?.dishes?.some((rowDish) => rowDish.id === dish.id) ||
+          editingRow?.dishes?.some((rowDish) => rowDish.id === dish.id)
+        );
+      })
+      .map((dish) => ({
+        id: dish.id,
+        name: dish.name,
+      }))
+      // Remove duplicates based on the dish id
+      .filter((value, index, self) => {
+        return index === self.findIndex((t) => t.id === value.id); // Ensure unique dishes by id
+      });
 
-    let editedRests = editedRowData?.restaurants?.filter(
-      (dish: { id: string; name?: string }) => {
-        if (dish.id || dish.name) {
-          return false;
-        }
-        return true;
-      }
-    );
+    const editedRests = editedRowData?.restaurants
+      ?.filter((rest) => {
+        // Add the dish to editedDishes if it is not in editingRow.dishes, or if it exists in both
+        return (
+          !editingRow?.restaurants?.some((rowDish) => rowDish.id === rest.id) ||
+          editingRow?.restaurants?.some((rowDish) => rowDish.id === rest.id)
+        );
+      })
+      .map((rest) => ({
+        id: rest.id,
+        name: rest.name,
+      }))
+      // Remove duplicates based on the dish id
+      .filter((value, index, self) => {
+        return index === self.findIndex((t) => t.id === value.id); // Ensure unique dishes by id
+      });
 
-    if (editedRests?.length === 0) {
-      editedRests = editedRowData?.restaurants?.map((rest) => rest.id);
-    }
+    // let editedRests = editedRowData?.restaurants?.filter(
+    //   (dish: { id: string; name?: string }) => {
+    //     if (dish.id || dish.name) {
+    //       return false;
+    //     }
+    //     return true;
+    //   }
+    // );
+
+    // if (editedRests?.length === 0) {
+    //   editedRests = editedRowData?.restaurants?.map((rest) => rest.id);
+    // }
     const editedData = {
       ...editedRowData,
+      // tags: editedTags,
       dishes: editedDishes,
       restaurants: editedRests,
-      restaurant: editedRowData.restaurant?.id
-        ? editedRowData.restaurant.id
-        : editedRowData.restaurant,
+      // restaurant: editedRowData.restaurant?.id
+      //   ? editedRowData.restaurant.id
+      //   : editedRowData.restaurant,
     };
     setEditingRow(null);
 
@@ -278,15 +309,15 @@ export const Dashboard = ({
       })
     );
 
-    setTimeout(() => {
-      dispatch(
-        actions.getAction({
-          collection: collection?.toLowerCase(),
-          page: paginationModel.page,
-          limit: paginationModel.pageSize,
-        })
-      );
-    }, 500); // Delay in milliseconds (e.g., 500ms)
+    // setTimeout(() => {
+    //   dispatch(
+    //     actions.getAction({
+    //       collection: collection?.toLowerCase(),
+    //       page: paginationModel.page,
+    //       limit: paginationModel.pageSize,
+    //     })
+    //   );
+    // }, 500); // Delay in milliseconds (e.g., 500ms)
 
     //TODO: re-render update to store in
   }, [editedRowData, collection, paginationModel, dispatch]);
@@ -295,36 +326,36 @@ export const Dashboard = ({
     (state) => state.collections[collection?.toLowerCase()] || {}
   );
 
-  useEffect(() => {
-    if (updatedData) {
-      console.log("updatedData", updatedData);
-      // Update rowsData based on updatedData
-      setData(updatedData);
-      setTimeout(() => {
-        setRowsData((prevRowsData) => {
-          const updatedRows = prevRowsData?.map((row) => {
-            // Find the matching data by ID and update it
-            const updatedItem = updatedData.find((item) => item.id === row.id);
+  // useEffect(() => {
+  //   if (updatedData) {
+  //     console.log("updatedData", updatedData);
+  //     // Update rowsData based on updatedData
+  //     setData(updatedData);
+  //     setTimeout(() => {
+  //       setRowsData((prevRowsData) => {
+  //         const updatedRows = prevRowsData?.map((row) => {
+  //           // Find the matching data by ID and update it
+  //           const updatedItem = updatedData.find((item) => item.id === row.id);
 
-            // If found, replace with the updated data, otherwise keep the original row
-            if (updatedItem) {
-              return { ...row, ...updatedItem };
-            }
+  //           // If found, replace with the updated data, otherwise keep the original row
+  //           if (updatedItem) {
+  //             return { ...row, ...updatedItem };
+  //           }
 
-            // If no match, return the row as is
-            return row;
-          });
+  //           // If no match, return the row as is
+  //           return row;
+  //         });
 
-          // Append new rows to the updated rowsData
-          return updatedRows;
-        });
-      }, 500);
+  //         // Append new rows to the updated rowsData
+  //         return updatedRows;
+  //       });
+  //     }, 500);
 
-      console.log("rowsData", rowsData);
+  //     console.log("rowsData", rowsData);
 
-      //todo: try to sent it from the checkbox
-    }
-  }, [updatedData]);
+  //     //todo: try to sent it from the checkbox
+  //   }
+  // }, [updatedData]);
 
   const handleCancelEdit = useCallback(() => {
     setEditingRow(null);

@@ -48,6 +48,16 @@ export const dishesRenderCell = (params: any) => {
   }
 };
 
+export const tagsRenderCell = (params: any) => {
+  const tags = params.row.tags;
+  if (tags) {
+    const tagsNames = tags
+      .map((tag: { id: string; name: string }) => tag?.name)
+      .join(", ");
+    return <span>{tagsNames}</span>;
+  }
+};
+
 export const restaurantsRenderCell = (params: any) => {
   const restaurants = params.row.restaurants;
   if (restaurants) {

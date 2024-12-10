@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { DASHBOARD } from "../../resources/content";
-import { uploadImageToCloudinary } from "../../api/uploadApi";
+import { uploadImageToCloudinary } from '../../api/uploadApi';
 import { DialogImg, UploadButton, UploadInput } from "../Dashboard/styles";
 
 interface EditDialogProps {
@@ -39,10 +39,10 @@ const EditDialog: React.FC<EditDialogProps> = ({
   onCancel,
   collection,
 }) => {
-  useEffect(() => {
+  useEffect(()=> {
     setImagePreview(editedRowData.img);
-  }, [editedRowData]);
-
+  }, [editedRowData])
+  
   const [imagePreview, setImagePreview] = useState<string | null>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -102,10 +102,10 @@ const EditDialog: React.FC<EditDialogProps> = ({
                 label={headerName}
               >
                 {options.map((option: any) => (
-                  <MenuItem key={option.id} value={option.id}>
+                  <MenuItem key={option} value={field === 'tags' ? option.id : option}>
                     {multiple ? (
                       <>
-                        <Checkbox checked={value.includes(option.id)} />
+                        <Checkbox checked={field === 'tags' ? value.includes(option.id) : value.includes(option)} />
                         <ListItemText primary={option.name} />
                       </>
                     ) : (
@@ -130,15 +130,17 @@ const EditDialog: React.FC<EditDialogProps> = ({
         })}
 
         <>
-          <UploadButton htmlFor="file-upload">
-            {DASHBOARD.EDIT_DIALOG.CHOOSE}
-          </UploadButton>
+        <UploadButton
+        htmlFor="file-upload"
+      >
+        {DASHBOARD.EDIT_DIALOG.CHOOSE}
+      </UploadButton>
 
-          <UploadInput
-            type="file"
-            id="file-upload"
-            onChange={handleImageChange}
-          />
+      <UploadInput
+        type="file"
+        id="file-upload"
+        onChange={handleImageChange}
+      />
           {imagePreview && (
             <div>
               <DialogImg
@@ -148,7 +150,7 @@ const EditDialog: React.FC<EditDialogProps> = ({
               />
             </div>
           )}
-          {isLoading && <CircularProgress size={24} />}
+          {isLoading && <CircularProgress size={20} />}
         </>
       </DialogContent>
       <DialogActions>

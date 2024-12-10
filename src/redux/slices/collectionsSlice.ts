@@ -36,6 +36,18 @@ const initialState: CollectionsState = {
     error: null,
     pagination: { currentPage: 1, totalPages: 1, totalItems: 0 },
   },
+  dishes: {
+    items: [],
+    loading: false,
+    error: null,
+    pagination: { currentPage: 1, totalPages: 1, totalItems: 0 },
+  },
+  chefs: {
+    items: [],
+    loading: false,
+    error: null,
+    pagination: { currentPage: 1, totalPages: 1, totalItems: 0 },
+  },
 };
 
 const collectionsSlice = createSlice({
