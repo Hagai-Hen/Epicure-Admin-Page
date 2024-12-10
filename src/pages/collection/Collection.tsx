@@ -4,46 +4,18 @@ import { Dashboard } from "../../components/Dashboard/Dashboard";
 import { COLLECTIONS, COLLECTIONS_DATA } from "../../resources/content";
 
 import {
-  setChefs,
-  createChef,
-  updateChef,
-  deleteChef,
-} from "../../redux/slices/chefsSlice";
-
-import {
-  setRestaurants,
-  createRestaurant,
-  updateRestaurant,
-  deleteRestaurant,
-} from "../../redux/slices/restaurantsSlice";
-
-import {
-  setDishes,
-  createDish,
-  updateDish,
-  deleteDish,
-} from "../../redux/slices/dishesSlice";
+  getCollection,
+  createCollectionItem,
+  deleteCollectionItem,
+  updateCollectionItem,
+} from "../../redux/slices/collectionsSlice";
 import { useEffect } from "react";
 
 const collectionToActionsMap: Record<string, any> = {
-  chefs: {
-    setAction: setChefs,
-    createAction: createChef,
-    updateAction: updateChef,
-    deleteAction: deleteChef,
-  },
-  restaurants: {
-    setAction: setRestaurants,
-    createAction: createRestaurant,
-    updateAction: updateRestaurant,
-    deleteAction: deleteRestaurant,
-  },
-  dishes: {
-    setAction: setDishes,
-    createAction: createDish,
-    updateAction: updateDish,
-    deleteAction: deleteDish,
-  },
+  getAction: getCollection,
+  createAction: createCollectionItem,
+  deleteAction: deleteCollectionItem,
+  updateAction: updateCollectionItem,
 };
 
 function CollectionPage({
@@ -61,7 +33,7 @@ function CollectionPage({
     return <h1>{COLLECTIONS.NOT_FOUND}</h1>;
   }
 
-  const actions = collectionToActionsMap[collection.toLowerCase()];
+  const actions = collectionToActionsMap;
 
   if (!actions) {
     return <h1>{COLLECTIONS.NOT_FOUND}</h1>;
@@ -69,15 +41,14 @@ function CollectionPage({
 
   const collectionData =
     COLLECTIONS_DATA[collection.toUpperCase() as keyof typeof COLLECTIONS_DATA];
-  const data = useSelector(
-    (state: any) => state[collection.toLowerCase()][collection.toLowerCase()]
-  );
 
   useEffect(() => {
-    if (!data || data.length === 0) {
-      dispatch(actions.setAction());
-    }
-  }, [data, dispatch, actions.setAction]);
+    dispatch(actions.getAction(collection.toLowerCase()));
+  }, [collection, dispatch]);
+
+  const data = useSelector(
+    (state: any) => state.collections[collection.toLowerCase()]?.items
+  );
 
   const columns = collectionData.columns;
 

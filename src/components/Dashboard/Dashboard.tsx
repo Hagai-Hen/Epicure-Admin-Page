@@ -32,14 +32,17 @@ interface DashboardProps {
   setActivePage: (page: string) => void;
   columnData: Column[];
   actions: {
-    setAction: (data: any[]) => void;
-    createAction: (data: any) => UnknownAction;
-    updateAction: (data: any) => UnknownAction;
-    deleteAction: (id: string) => UnknownAction;
+    createAction: (params: { collection: string; item: any }) => UnknownAction;
+    updateAction: (params: { collection: string; item: any }) => UnknownAction;
+    deleteAction: (params: { collection: string; id: string }) => UnknownAction;
+    getAction: (collection: string) => UnknownAction;
   };
 }
 interface RowData {
   id: string;
+  dishes?: { id: string; name?: string }[];
+  restaurants?: { id: string; name?: string }[];
+  restaurant?: { id: string };
 }
 
 export const Dashboard = ({
@@ -79,7 +82,7 @@ export const Dashboard = ({
   useEffect(() => {
     setActivePage(collection || "");
     setRowsData(data);
-  }, [collection]);
+  }, [collection, data]);
 
   const handleCreateDialogOpen = useCallback(() => {
     setOpenCreateDialog(true);
@@ -89,18 +92,26 @@ export const Dashboard = ({
       const { name, value } = e.target;
       const updatedRowData = { ...newRowData, [name]: value };
       setNewRowData(updatedRowData);
-      const isValid = Object.values(updatedRowData).every((val) => val !== "");
+      const isValid = Object.values(updatedRowData).every((val) => {
+        if (Array.isArray(val)) {
+          return val.length > 0;
+        }
+        return val !== "";
+      });
       setIsFormValid(isValid);
     },
     [newRowData]
   );
 
   const handleSaveCreate = useCallback(() => {
-    const newRow = { id: `${data.length + 1}`, ...newRowData };
-    dispatch(actions.createAction(newRow));
-    setRowsData((prevRows) => [...prevRows, newRow]);
-    setNewRowData({});
+    dispatch(
+      actions.createAction({
+        collection: collection?.toLowerCase() || "",
+        item: newRowData,
+      })
+    );
     setOpenCreateDialog(false);
+    setIsFormValid(false);
   }, [rowsData, newRowData]);
 
   const handleCancelCreate = useCallback(() => {
@@ -114,13 +125,20 @@ export const Dashboard = ({
       const row = rowsData.find((row) => row.id === id);
       if (row) setRowToDelete(row);
       setOpenDeleteDialog(true);
+      dispatch(actions.getAction(collection?.toLowerCase() || ""));
     },
     [rowsData]
   );
 
   const confirmDelete = useCallback(() => {
     if (rowToDelete) {
-      dispatch(actions.deleteAction(rowToDelete.id));
+      dispatch(
+        actions.deleteAction({
+          collection: collection?.toLowerCase() || "",
+          id: rowToDelete.id,
+        })
+      );
+      dispatch(actions.getAction(collection?.toLowerCase() || ""));
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
@@ -150,12 +168,29 @@ export const Dashboard = ({
   );
 
   const handleSaveEdit = useCallback(() => {
-    const updatedRows = rowsData.map((row) =>
-      row.id === editingRow?.id ? { ...row, ...editedRowData } : row
+    const editedDishes = editedRowData?.dishes?.filter(
+      (dish: { id: string; name?: string }) => dish.id || dish.name
     );
+
+    const editedRests = editedRowData?.restaurants?.filter(
+      (rest: { id: string; name?: string }) => rest.id || rest.name
+    );
+    const editedData = {
+      ...editedRowData,
+      dishes: editedDishes,
+      restaurants: editedRests,
+      restaurant: editedRowData.restaurant?.id
+        ? editedRowData.restaurant.id
+        : editedRowData.restaurant,
+    };
     setEditingRow(null);
-    setRowsData(updatedRows);
-    dispatch(actions.updateAction(editedRowData));
+    dispatch(
+      actions.updateAction({
+        collection: collection?.toLowerCase() || "",
+        item: editedData,
+      })
+    );
+    dispatch(actions.getAction(collection?.toLowerCase() || ""));
   }, [rowsData, editingRow, editedRowData]);
 
   const handleCancelEdit = useCallback(() => {
@@ -166,16 +201,18 @@ export const Dashboard = ({
     navigate(-1);
   }, [navigate]);
 
-  const updatedColumns = columnData.map((col) => {
-    if (col.field === "actions") {
-      return {
-        ...col,
-        renderCell: (params: any) =>
-          renderActionsCell({ ...params, api: { gridOptions } }),
-      };
-    }
-    return col;
-  });
+  const updatedColumns = columnData
+    .filter((col) => col.field !== "chef")
+    .map((col) => {
+      if (col.field === "actions") {
+        return {
+          ...col,
+          renderCell: (params: any) =>
+            renderActionsCell({ ...params, api: { gridOptions } }),
+        };
+      }
+      return col;
+    });
 
   const gridOptions = {
     handleEdit,
@@ -193,7 +230,7 @@ export const Dashboard = ({
             </DashboardBackContainer>
             <DashboardHeaderTitle>{displayName}</DashboardHeaderTitle>
             <DashboardHeaderEntries>
-              {data.length} {DASHBOARD.HEADER.ENTRIES}
+              {rowsData?.length} {DASHBOARD.HEADER.ENTRIES}
             </DashboardHeaderEntries>
           </DashboardLeftHeader>
           <DashboardRightHeader>
@@ -204,7 +241,7 @@ export const Dashboard = ({
         </DashboardHeaderContainer>
         <CustomPaper>
           <DataGrid
-            rows={data}
+            rows={rowsData}
             columns={updatedColumns}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[5, 10]}
@@ -222,6 +259,7 @@ export const Dashboard = ({
         onSave={handleSaveCreate}
         onCancel={handleCancelCreate}
         setNewRowData={setNewRowData}
+        collection={collection}
       />
 
       <EditDialog
@@ -232,6 +270,7 @@ export const Dashboard = ({
         onFieldChange={handleFieldChange}
         onSave={handleSaveEdit}
         onCancel={handleCancelEdit}
+        collection={collection}
       />
 
       <DeleteDialog
