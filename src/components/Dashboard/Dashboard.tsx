@@ -33,10 +33,7 @@ interface DashboardProps {
   setActivePage: (page: string) => void;
   columnData: Column[];
   actions: {
-    createAction: (params: {
-      collection: string;
-      item: any;
-    }) => UnknownAction;
+    createAction: (params: { collection: string; item: any }) => UnknownAction;
     updateAction: (params: { collection: string; item: any }) => UnknownAction;
     deleteAction: (params: { collection: string; id: string }) => UnknownAction;
     getAction: (params: {
@@ -99,7 +96,8 @@ export const Dashboard = ({
     displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
 
   const pagination = useSelector(
-    (state: RootState) => state.collections[collection?.toLowerCase() || ""]?.pagination
+    (state: RootState) =>
+      state.collections[collection?.toLowerCase() || ""]?.pagination
   );
 
   useEffect(() => {
@@ -144,14 +142,15 @@ export const Dashboard = ({
         item: newRowData,
       })
     );
-
-    dispatch(
-      actions.getAction({
-        collection: collection?.toLowerCase(),
-        page: paginationModel.page,
-        limit: paginationModel.pageSize,
-      })
-    );
+    setTimeout(() => {
+      dispatch(
+        actions.getAction({
+          collection: collection?.toLowerCase(),
+          page: paginationModel.page,
+          limit: paginationModel.pageSize,
+        })
+      );
+    }, 500);
     setOpenCreateDialog(false);
     setIsFormValid(false);
   }, [rowsData, newRowData]);
@@ -264,7 +263,8 @@ export const Dashboard = ({
   }, [editedRowData, collection, paginationModel, dispatch]);
 
   const updatedData: any = useSelector(
-    (state: RootState) => state.collections[collection?.toLowerCase() || ""]?.items
+    (state: RootState) =>
+      state.collections[collection?.toLowerCase() || ""]?.items
   );
 
   useEffect(() => {
@@ -355,7 +355,7 @@ export const Dashboard = ({
         </DashboardHeaderContainer>
         <CustomPaper>
           <DataGrid
-            rows={rowsData} 
+            rows={rowsData}
             columns={updatedColumns}
             pagination
             paginationMode="server"
