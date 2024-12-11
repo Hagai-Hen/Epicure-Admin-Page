@@ -3,7 +3,6 @@ import {
   createItem,
   deleteItem,
   editItem,
-  fetchData,
   fetchDataPage,
 } from "../../api/collectionApi";
 
@@ -104,7 +103,7 @@ const collectionsSlice = createSlice({
         };
       })
       .addCase(getCollection.fulfilled, (state, action) => {
-        const { collection, data, pagination } = action.payload;
+        const { collection, data = [], pagination } = action.payload;
 
         // Append new items while avoiding duplicates
         const updatedItems = [
@@ -219,7 +218,7 @@ export const getCollection = createAsyncThunk(
     limit: number;
   }) => {
     const data = await fetchDataPage(collection, page, limit);
-    return { collection, data: data.data, pagination: data.pagination };
+    return { collection, data: data?.data, pagination: data?.pagination };
   }
 );
 

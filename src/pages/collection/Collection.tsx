@@ -14,7 +14,7 @@ const collectionToActionsMap: Record<string, any> = {
   createAction: createCollectionItem,
   deleteAction: deleteCollectionItem,
   updateAction: updateCollectionItem,
-  setCollectionData: setCollectionData,
+  setCollectionData: setCollectionData
 };
 
 function CollectionPage({

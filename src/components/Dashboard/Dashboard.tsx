@@ -22,6 +22,7 @@ import {
   DashboardHeaderEntries,
 } from "./styles";
 import { UnknownAction } from "@reduxjs/toolkit";
+import { RootState } from "../../redux/store";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
@@ -34,8 +35,7 @@ interface DashboardProps {
   actions: {
     createAction: (params: {
       collection: string;
-      page: string;
-      limit: string;
+      item: any;
     }) => UnknownAction;
     updateAction: (params: { collection: string; item: any }) => UnknownAction;
     deleteAction: (params: { collection: string; id: string }) => UnknownAction;
@@ -99,7 +99,7 @@ export const Dashboard = ({
     displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
 
   const pagination = useSelector(
-    (state) => state.collections[collection?.toLowerCase()]?.pagination
+    (state: RootState) => state.collections[collection?.toLowerCase() || ""]?.pagination
   );
 
   useEffect(() => {
@@ -182,7 +182,7 @@ export const Dashboard = ({
         })
       );
       setData((prevData) => {
-        return prevData.filter((item) => item.id !== rowToDelete.id);
+        return prevData.filter((item: any) => item.id !== rowToDelete.id);
       });
       dispatch(
         actions.getAction({
@@ -263,8 +263,8 @@ export const Dashboard = ({
     );
   }, [editedRowData, collection, paginationModel, dispatch]);
 
-  const { items: updatedData } = useSelector(
-    (state) => state.collections[collection?.toLowerCase()] || {}
+  const updatedData: any = useSelector(
+    (state: RootState) => state.collections[collection?.toLowerCase() || ""]?.items
   );
 
   useEffect(() => {

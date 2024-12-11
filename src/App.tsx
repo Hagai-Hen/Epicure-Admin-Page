@@ -17,7 +17,7 @@ function App() {
         setActivePage={setActivePage}
       />
       <Routes>
-        <Route path={`${ROUTES.HOME_PAGE}`} element={<h1>Home Page</h1>} />
+        <Route path={`${ROUTES.HOME_PAGE}`} element={<div/>} />
         <Route
           path={`${ROUTES.COLLECTIONS}${ROUTES.COLLECTION}`}
           element={<CollectionPage setActivePage={setActivePage} />}
