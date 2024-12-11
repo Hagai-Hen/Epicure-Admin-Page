@@ -7,3 +7,8 @@ export const AppContainer = styled.div`
   width: 100vw;
   height: 100vh;
 `;
+
+export const MainContainer = styled.main`
+  flex-grow: 1;
+  padding: 20px;
+`;
