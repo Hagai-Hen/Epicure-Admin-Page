@@ -1,5 +1,7 @@
+import { fetchWithAuth } from "../resources/fetchWrapper";
 import { getDishName } from "./dishesApi";
 import { getRestaurantName } from "./restaurantsApi";
+
 
 export const fetchData = async (collection: string) => {
   try {
@@ -126,21 +128,22 @@ export const fetchDataPage = async (
 };
 
 export const createItem = async (collection: string, itemData: any) => {
-  try {
-    const token = sessionStorage.getItem("token");
 
+  try {
     if (itemData.tags && !Array.isArray(itemData.tags)) {
       itemData.tags = [itemData.tags];
     }
-    const response = await fetch(`/api/${collection}/create`, {
+
+    const response = await fetchWithAuth(`/api/${collection}/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(itemData),
     });
-    const data = await response.json();
+
+    const data = await response;
+
     if (data._id) {
       data.id = data._id;
       data._id = undefined;
@@ -153,15 +156,13 @@ export const createItem = async (collection: string, itemData: any) => {
 
 export const deleteItem = async (collection: string, id: string) => {
   try {
-    const token = sessionStorage.getItem("token");
-    const response = await fetch(`/api/${collection}/delete/${id}`, {
+    const response = await fetchWithAuth(`/api/${collection}/delete/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
     });
-    const data = await response.json();
+    const data = await response;
     if (data._id) {
       data.id = data._id;
       data._id = undefined;
@@ -178,16 +179,14 @@ export const editItem = async (collection: string, itemData: any) => {
     if (itemData.tags && !Array.isArray(itemData.tags)) {
       itemData.tags = [itemData.tags];
     }
-    const token = sessionStorage.getItem("token");
-    const response = await fetch(`/api/${collection}/update/${itemData.id}`, {
+    const response = await fetchWithAuth(`/api/${collection}/update/${itemData.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(itemData),
     });
-    const data = await response.json();
+    const data = await response;
 
     if (data._id) {
       data.id = data._id;
