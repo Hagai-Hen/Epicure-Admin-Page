@@ -23,6 +23,8 @@ import {
 } from "./styles";
 import { UnknownAction } from "@reduxjs/toolkit";
 import { RootState } from "../../redux/store";
+import { useAuthContext } from "../../context/useAuthContext";
+import { ROUTES } from "../../constants/routes";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
@@ -73,11 +75,19 @@ export const Dashboard = ({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEditFormValid, setIsEditFormValid] = useState(true);
   const [data, setData] = useState([]);
+  const { authUser, setAuthUser } = useAuthContext();
 
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 5,
   });
+
+  const handleLogout = () => {
+    setAuthUser(null);
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("authUser");
+    navigate(`${ROUTES.LOGIN}`)
+  };
 
   const newRowDataInitial = useMemo(() => {
     return columnData.reduce((acc: any, col: Column) => {

@@ -62,6 +62,8 @@ export const DashboardLeftHeader = styled.div`
 
 export const DashboardRightHeader = styled.div`
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 `;
 
 export const DashboardCreateButton = styled.button`

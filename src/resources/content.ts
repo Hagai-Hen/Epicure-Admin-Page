@@ -51,6 +51,10 @@ export const LOGIN_PAGE = {
   LOGIN_BUTTON: "Log in",
 }
 
+export const HOME_PAGE = {
+  WELCOME: "Welcome,"
+}
+
 export const COLLECTIONS_DATA = {
   RESTAURANTS: {
     columns: [

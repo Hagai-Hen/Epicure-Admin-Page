@@ -36,7 +36,7 @@ export const fetchData = async (collection: string) => {
             )
           : [];
 
-          let restaurantNameForDish = null;
+        let restaurantNameForDish = null;
         if (item?.restaurant) {
           const restaurantName = await getRestaurantName(item.restaurant);
           restaurantNameForDish = {
@@ -63,7 +63,7 @@ export const fetchData = async (collection: string) => {
 export const fetchDataPage = async (
   collection: string,
   page: number = 1,
-  limit: number = 5,
+  limit: number = 5
 ) => {
   try {
     const response = await fetch(
@@ -127,6 +127,8 @@ export const fetchDataPage = async (
 
 export const createItem = async (collection: string, itemData: any) => {
   try {
+    const token = sessionStorage.getItem("token");
+
     if (itemData.tags && !Array.isArray(itemData.tags)) {
       itemData.tags = [itemData.tags];
     }
@@ -134,6 +136,7 @@ export const createItem = async (collection: string, itemData: any) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(itemData),
     });
@@ -150,10 +153,12 @@ export const createItem = async (collection: string, itemData: any) => {
 
 export const deleteItem = async (collection: string, id: string) => {
   try {
+    const token = sessionStorage.getItem("token");
     const response = await fetch(`/api/${collection}/delete/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     const data = await response.json();
@@ -173,10 +178,12 @@ export const editItem = async (collection: string, itemData: any) => {
     if (itemData.tags && !Array.isArray(itemData.tags)) {
       itemData.tags = [itemData.tags];
     }
+    const token = sessionStorage.getItem("token");
     const response = await fetch(`/api/${collection}/update/${itemData.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(itemData),
     });

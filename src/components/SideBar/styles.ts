@@ -3,6 +3,7 @@ import { colors } from "../../constants/colors";
 import CircleIcon from "@mui/icons-material/Circle";
 import SearchIcon from "@mui/icons-material/Search";
 import { FONT_SIZE } from "../../constants/sizes";
+import { Login, Logout } from "@mui/icons-material";
 
 interface SideBarItemProps {
   isActive: boolean;
@@ -19,7 +20,7 @@ export const SideBarHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 20px;
+  padding: 0px 20px;
   max-width: 100%;
 `;
 
@@ -95,3 +96,14 @@ export const SmallCircleIcon = styled(CircleIcon)<SideBarItemProps>`
   max-height: 6px;
   max-width: 6px;
 `;
+
+export const LogoutIcon = styled(Logout)`
+padding: 10px 10px;
+  cursor: pointer;
+`;
+
+export const LoginIcon = styled(Login)`
+padding: 10px 10px;
+  cursor: pointer;
+`;
+

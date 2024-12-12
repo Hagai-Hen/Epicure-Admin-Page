@@ -10,8 +10,6 @@ export const LoginMainContainer = styled.div`
 
 export const LoginSheet = styled.div`
   width: 300px;
-  margin-left: auto;
-  margin-right: auto;
   margin-top: 16px;
   margin-bottom: 16px;
   padding-top: 24px;
@@ -20,14 +18,22 @@ export const LoginSheet = styled.div`
   padding-right: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 1px solid #ccc;
 `;
 
-export const LoginButton = styled("Button")`
-margin-top: 5px;
-background-color: ${colors.borderButtonColor};
-color: white;
+export const LoginButton = styled.button`
+  background-color: ${colors.borderButtonColor};
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+
+  &:hover {
+    background-color: ${colors.buttonClicked};
+  }
 `;
