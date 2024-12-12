@@ -1,10 +1,8 @@
 import { ROUTES } from "../constants/routes";
-import { LOGIN_PAGE } from "./content";
 
 export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   const token = sessionStorage.getItem("token");
 
-  // Attach the token if available
   if (token) {
     options.headers = {
       ...options.headers,
@@ -24,6 +22,10 @@ export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
       window.location.href = ROUTES.LOGIN;
       alert("User is not authorized or session expired.")
       return null;
+    }
+
+    if (response.status === 403) {
+      alert("Insufficient permissions for this operation.")
     }
 
     if (!response.ok) {

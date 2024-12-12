@@ -45,7 +45,7 @@ export const LOGIN_PAGE = {
   WELCOME: "Welcome!",
   SIGN_IN: "Sign in to continue.",
   EMAIL: "Email",
-  EMAIL_PLACEHOLDER: "dev@moveo.co.il",
+  EMAIL_PLACEHOLDER: "example@moveo.co.il",
   PASSWORD: "Password",
   PASSWORD_PLACEHOLDER: "password",
   LOGIN_BUTTON: "Log in",

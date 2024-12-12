@@ -15,7 +15,6 @@ function App() {
 
   const isLoginPage = location.pathname === ROUTES.LOGIN;
   const { authUser } = useAuthContext();
-  console.log("authUser", authUser)
 
   return (
     <AppContainer>
