@@ -49,22 +49,30 @@ export const LOGIN_PAGE = {
   PASSWORD: "Password",
   PASSWORD_PLACEHOLDER: "password",
   LOGIN_BUTTON: "Log in",
-}
+};
 
 export const HOME_PAGE = {
-  WELCOME: "Welcome,"
-}
+  WELCOME: "Welcome,",
+};
 
 export const COLLECTIONS_DATA = {
   RESTAURANTS: {
     columns: [
-      { field: "id", headerName: "ID", width: 70 },
+      {
+        field: "id",
+        headerName: "ID",
+        width: 70,
+        sortable: false,
+        disableColumnMenu: true,
+      },
       { field: "name", headerName: "Name", width: 130 },
       {
         field: "img",
         headerName: "Image",
         width: 130,
         renderCell: renderImgCell,
+        sortable: false,
+        disableColumnMenu: true,
       },
       {
         field: "chef",
@@ -101,29 +109,42 @@ export const COLLECTIONS_DATA = {
         renderCell: dishesRenderCell,
         multiple: true,
         width: 130,
+        sortable: false,
+        disableColumnMenu: true,
       },
       {
         field: "actions",
         headerName: "Actions",
         width: 100,
         renderCell: renderActionsCell,
+        sortable: false,
+        disableColumnMenu: true,
       },
     ],
   },
   CHEFS: {
     columns: [
-      { field: "id", headerName: "ID", width: 70 },
+      {
+        field: "id",
+        headerName: "ID",
+        width: 70,
+        sortable: false,
+        disableColumnMenu: true,
+      },
       { field: "name", headerName: "Name", width: 130 },
       {
         field: "img",
         headerName: "Image",
         width: 130,
         renderCell: renderImgCell,
+        sortable: false,
+        disableColumnMenu: true,
       },
       {
         field: "description",
         headerName: "Description",
         width: 180,
+        sortable: false,
       },
       {
         field: "restaurants",
@@ -138,24 +159,36 @@ export const COLLECTIONS_DATA = {
         renderCell: restaurantsRenderCell,
         multiple: true,
         width: 130,
+        sortable: false,
+        disableColumnMenu: true,
       },
       {
         field: "actions",
         headerName: "Actions",
         width: 100,
         renderCell: renderActionsCell,
+        sortable: false,
+        disableColumnMenu: true,
       },
     ],
   },
   DISHES: {
     columns: [
-      { field: "id", headerName: "ID", width: 70 },
+      {
+        field: "id",
+        headerName: "ID",
+        width: 70,
+        sortable: false,
+        disableColumnMenu: true,
+      },
       { field: "name", headerName: "Name", width: 130 },
       {
         field: "img",
         headerName: "Image",
         width: 130,
         renderCell: renderImgCell,
+        sortable: false,
+        disableColumnMenu: true,
       },
       {
         field: "price",
@@ -166,6 +199,7 @@ export const COLLECTIONS_DATA = {
         field: "ingredients",
         headerName: "Ingredients",
         width: 180,
+        sortable: false,
       },
       {
         field: "restaurant",
@@ -200,12 +234,15 @@ export const COLLECTIONS_DATA = {
         ],
         multiple: true,
         width: 130,
+        sortable: false,
       },
       {
         field: "actions",
         headerName: "Actions",
         width: 100,
         renderCell: renderActionsCell,
+        sortable: false,
+        disableColumnMenu: true,
       },
     ],
   },

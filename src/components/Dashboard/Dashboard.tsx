@@ -23,6 +23,7 @@ import {
 } from "./styles";
 import { UnknownAction } from "@reduxjs/toolkit";
 import { RootState } from "../../redux/store";
+import { useAuthContext } from "../../context/useAuthContext";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
@@ -73,6 +74,7 @@ export const Dashboard = ({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEditFormValid, setIsEditFormValid] = useState(true);
   const [data, setData] = useState([]);
+  const { authUser } = useAuthContext();
 
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -321,14 +323,19 @@ export const Dashboard = ({
     .filter((col) => col.field !== "chef")
     .map((col) => {
       if (col.field === "actions") {
-        return {
-          ...col,
-          renderCell: (params: any) =>
-            renderActionsCell({ ...params, api: { gridOptions } }),
-        };
+        if (authUser?.role === "ADMIN") {
+          return {
+            ...col,
+            renderCell: (params: any) =>
+              renderActionsCell({ ...params, api: { gridOptions } }),
+          };
+        } else {
+          return null;
+        }
       }
       return col;
-    });
+    })
+    .filter((col) => col !== null);
 
   const gridOptions = {
     handleEdit,

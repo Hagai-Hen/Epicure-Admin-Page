@@ -83,7 +83,7 @@ export const CustomPaper = styled(Paper)`
 `;
 
 export const TableImg = styled.img`
-  width: 100%;
+  width: 100px;
   height: auto;
   border-radius: 8px;
 `;

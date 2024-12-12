@@ -18,7 +18,7 @@ interface ParamsInterface {
 export const renderActionsCell = (params: ParamsInterface) => {
   return (
     <>
-      <IconButton
+       <IconButton
         onClick={() => params.api.gridOptions.handleEdit(params.row)}
         color="default"
       >
@@ -30,6 +30,7 @@ export const renderActionsCell = (params: ParamsInterface) => {
       >
         <DeleteIcon />
       </IconButton>
+
     </>
   );
 };
