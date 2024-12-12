@@ -157,7 +157,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
         })}
 
         <>
-        <UploadButton htmlFor="file-upload">
+          <UploadButton htmlFor="file-upload">
             {DASHBOARD.EDIT_DIALOG.CHOOSE}
           </UploadButton>
 
@@ -167,15 +167,11 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
             onChange={handleImageChange}
           />
           {loading ? (
-            <CircularProgress />
+            <CircularProgress size={20} />
           ) : (
             imagePreview && (
               <div>
-                <DialogImg
-                  src={imagePreview}
-                  alt="Image preview"
-                  
-                />
+                <DialogImg src={imagePreview} alt="Image preview" />
               </div>
             )
           )}
