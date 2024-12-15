@@ -39,12 +39,20 @@ const EditDialog: React.FC<EditDialogProps> = ({
   onCancel,
   collection,
 }) => {
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [rateValid, setRateValid] = useState<boolean>(true);
+  const [priceValid, setPriceValid] = useState<boolean>(true);
+
   useEffect(() => {
     setImagePreview(editedRowData.img);
   }, [editedRowData]);
 
-  const [imagePreview, setImagePreview] = useState<string | null>();
-  const [isLoading, setIsLoading] = useState(false);
+  const handleCancel = () => {
+    setRateValid(true);
+    setPriceValid(true);
+    onCancel();
+  }
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -70,12 +78,36 @@ const EditDialog: React.FC<EditDialogProps> = ({
     }
   };
 
+  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    if (name === "rate") {
+      const rateValue = Number(value);
+      if (rateValue >= 1 && rateValue <= 5) {
+        setRateValid(true);
+      } else {
+        setRateValid(false);
+      }
+    }
+
+    if (name === "price") {
+      const priceValue = Number(value);
+      if (priceValue > 0) {
+        setPriceValid(true);
+      } else {
+        setPriceValid(false);
+      }
+    }
+
+    onFieldChange({ target: { name, value } } as React.ChangeEvent<HTMLInputElement>);
+  };
+
   const handleSave = async () => {
     onSave();
   };
 
   return (
-    <Dialog open={open} onClose={onCancel}>
+    <Dialog open={open} onClose={handleCancel}>
       <DialogTitle>
         {DASHBOARD.EDIT_DIALOG.TITLE} {collection?.slice(0, -1)}
       </DialogTitle>
@@ -89,8 +121,10 @@ const EditDialog: React.FC<EditDialogProps> = ({
             field === "img"
           )
             return null;
+
           const value = editedRowData[field] || (multiple ? [] : "");
           const isList = col.type === "list";
+
           return isList ? (
             <FormControl fullWidth margin="normal" key={field}>
               <InputLabel>{headerName}</InputLabel>
@@ -98,7 +132,7 @@ const EditDialog: React.FC<EditDialogProps> = ({
                 multiple={multiple}
                 name={field}
                 value={value}
-                onChange={onFieldChange}
+                onChange={handleFieldChange}
                 label={headerName}
               >
                 {options.map((option: any) => (
@@ -131,9 +165,17 @@ const EditDialog: React.FC<EditDialogProps> = ({
               name={field}
               type={type || "text"}
               value={value}
-              onChange={onFieldChange}
+              onChange={handleFieldChange}
               fullWidth
               margin="normal"
+              error={field === "rate" && !rateValid || field === "price" && !priceValid}
+              helperText={
+                field === "rate" && !rateValid
+                  ? "Rate must be between 1 and 5"
+                  : field === "price" && !priceValid
+                  ? "Price must be a positive number"
+                  : ""
+              }
             />
           );
         })}
@@ -167,7 +209,7 @@ const EditDialog: React.FC<EditDialogProps> = ({
         <Button
           onClick={handleSave}
           color="primary"
-          disabled={!isFormValid || isLoading}
+          disabled={!isFormValid || !rateValid || !priceValid || isLoading}
         >
           {DASHBOARD.EDIT_DIALOG.SAVE}
         </Button>

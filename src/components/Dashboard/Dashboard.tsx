@@ -99,7 +99,7 @@ export const Dashboard = ({
 
   const pagination = useSelector(
     (state: RootState) =>
-      state.collections[collection?.toLowerCase() || ""]?.pagination
+      state?.collections[collection?.toLowerCase() || ""]?.pagination
   );
 
   useEffect(() => {
@@ -126,7 +126,7 @@ export const Dashboard = ({
 
       const isValid = Object.entries(updatedRowData).every(
         ([fieldName, val]) => {
-          if (Array.isArray(val) && fieldName !== "dishes") {
+          if (Array.isArray(val) && fieldName !== "dishes" && fieldName !== "tags") {
             return val.length > 0;
           } else {
             return val !== "";
@@ -357,9 +357,11 @@ export const Dashboard = ({
             </DashboardHeaderEntries>
           </DashboardLeftHeader>
           <DashboardRightHeader>
-            <DashboardCreateButton onClick={handleCreateDialogOpen}>
-              {DASHBOARD.HEADER.CREATE_BUTTON}
-            </DashboardCreateButton>
+            {authUser && (
+              <DashboardCreateButton onClick={handleCreateDialogOpen}>
+                {DASHBOARD.HEADER.CREATE_BUTTON}
+              </DashboardCreateButton>
+            )}
           </DashboardRightHeader>
         </DashboardHeaderContainer>
         <CustomPaper>

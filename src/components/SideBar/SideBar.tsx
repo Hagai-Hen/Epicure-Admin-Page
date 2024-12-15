@@ -68,7 +68,6 @@ export const SideBar = ({
         {!authUser && <LoginIcon onClick={handleLogin} />}
         <SideBarHeader>
           <HeaderText>{SIDE_BAR.HEADER_TITLE}</HeaderText>
-          <CustomSearchIcon />
         </SideBarHeader>
         <Divider />
         <SideBarTitleContainer>

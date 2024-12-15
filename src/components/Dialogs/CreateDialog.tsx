@@ -43,6 +43,8 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [rateValid, setRateValid] = useState<boolean>(true); 
+  const [priceValid, setPriceValid] = useState<boolean>(true);
 
   const initializedRowData = useMemo(() => {
     if (!open) return {};
@@ -91,6 +93,30 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
     }
   };
 
+  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    if (name === "rate") {
+      const rateValue = Number(value);
+      if (rateValue >= 1 && rateValue <= 5) {
+        setRateValid(true);
+      } else {
+        setRateValid(false);
+      }
+    }
+
+    if (name === "price") {
+      const priceValue = Number(value);
+      if (priceValue > 0) {
+        setPriceValid(true);
+      } else {
+        setPriceValid(false);
+      }
+    }
+
+    onFieldChange({ target: { name, value } } as React.ChangeEvent<HTMLInputElement>);
+  };
+
   const handleSave = async () => {
     setImagePreview(null);
     onSave();
@@ -98,6 +124,8 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
 
   const handleCancel = async () => {
     setImagePreview(null);
+    setPriceValid(true);
+    setRateValid(true);
     onCancel();
   };
 
@@ -116,8 +144,10 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
             field === "img"
           )
             return null;
-          const value = newRowData[field] || [];
+
+          const value = newRowData[field] || (multiple ? [] : "");
           const isList = col.type === "list";
+
           return isList ? (
             <FormControl fullWidth margin="normal" key={field}>
               <InputLabel>{headerName}</InputLabel>
@@ -125,7 +155,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
                 multiple={multiple}
                 name={field}
                 value={value}
-                onChange={onFieldChange}
+                onChange={handleFieldChange}
                 label={headerName}
               >
                 {options.map((option: any) => (
@@ -149,9 +179,17 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
               name={field}
               type={type || "text"}
               value={value}
-              onChange={onFieldChange}
+              onChange={handleFieldChange}
               fullWidth
               margin="normal"
+              error={(field === "rate" && !rateValid) || (field === "price" && !priceValid)} 
+              helperText={
+                field === "rate" && !rateValid
+                  ? "Rate must be between 1 and 5"
+                  : field === "price" && !priceValid
+                  ? "Price must be a positive number"
+                  : ""
+              }
             />
           );
         })}
@@ -181,7 +219,11 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
         <Button onClick={handleCancel} color="primary">
           {DASHBOARD.CREATE_DIALOG.CANCEL}
         </Button>
-        <Button onClick={handleSave} color="primary" disabled={!isFormValid}>
+        <Button
+          onClick={handleSave}
+          color="primary"
+          disabled={!isFormValid || !rateValid || !priceValid || loading}
+        >
           {DASHBOARD.CREATE_DIALOG.CREATE}
         </Button>
       </DialogActions>

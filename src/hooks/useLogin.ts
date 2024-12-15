@@ -1,16 +1,16 @@
 import { useState } from "react";
 import forge from "node-forge";
 import { useAuthContext } from "../context/useAuthContext";
-import { PUBLIC_KEY } from "../resources/keys";  // Public key is imported here
+import { PUBLIC_KEY } from "../resources/keys";
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
   const { setAuthUser } = useAuthContext();
 
   const encryptPassword = (password: string) => {
-    const publicKey = forge.pki.publicKeyFromPem(PUBLIC_KEY);  // Load the public key
-    const encrypted = publicKey.encrypt(password, 'RSA-OAEP');  // Encrypt password using RSA-OAEP padding
-    return forge.util.encode64(encrypted);  // Return the encrypted password as base64 string
+    const publicKey = forge.pki.publicKeyFromPem(PUBLIC_KEY);
+    const encrypted = publicKey.encrypt(password, 'RSA-OAEP');
+    return forge.util.encode64(encrypted);
   };
 
   const login = async (email: string, password: string) => {
@@ -21,7 +21,6 @@ const useLogin = () => {
 
     try {
       const encryptedPassword = encryptPassword(password);
-      console.log("encrypted", encryptedPassword);
 
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -41,6 +40,7 @@ const useLogin = () => {
       setAuthUser(data.authUser);
     } catch (error) {
       console.log("Error in login", (error as Error).message);
+      alert("Invalid username or password");
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,6 @@ const useLogin = () => {
   return { loading, login };
 };
 
-// Input validation function
 function handleInputErrors({
   email,
   password,
