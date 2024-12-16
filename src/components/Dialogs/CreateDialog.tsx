@@ -43,7 +43,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [rateValid, setRateValid] = useState<boolean>(true); 
+  const [rateValid, setRateValid] = useState<boolean>(true);
   const [priceValid, setPriceValid] = useState<boolean>(true);
 
   const initializedRowData = useMemo(() => {
@@ -93,7 +93,7 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
     }
   };
 
-  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     const { name, value } = e.target;
 
     if (name === "rate") {
@@ -114,7 +114,9 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
       }
     }
 
-    onFieldChange({ target: { name, value } } as React.ChangeEvent<HTMLInputElement>);
+    onFieldChange({
+      target: { name, value },
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
   const handleSave = async () => {
@@ -182,7 +184,10 @@ const CreateDialog: React.FC<CreateDialogProps> = ({
               onChange={handleFieldChange}
               fullWidth
               margin="normal"
-              error={(field === "rate" && !rateValid) || (field === "price" && !priceValid)} 
+              error={
+                (field === "rate" && !rateValid) ||
+                (field === "price" && !priceValid)
+              }
               helperText={
                 field === "rate" && !rateValid
                   ? "Rate must be between 1 and 5"

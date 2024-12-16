@@ -1,4 +1,3 @@
-import { Typography } from "@mui/material";
 import { useAuthContext } from "../../context/useAuthContext";
 import { HomeMainContainer, WelcomeTypo } from "./styles";
 import { HOME_PAGE } from "../../resources/content";

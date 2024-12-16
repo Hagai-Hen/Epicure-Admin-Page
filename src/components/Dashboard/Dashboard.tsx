@@ -21,35 +21,17 @@ import {
   DashboardHeaderBack,
   DashboardHeaderEntries,
 } from "./styles";
-import { UnknownAction } from "@reduxjs/toolkit";
 import { RootState } from "../../redux/store";
 import { useAuthContext } from "../../context/useAuthContext";
-import { Box, Skeleton } from "@mui/material";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
 }
 
 interface DashboardProps {
-  data: any[];
   setActivePage: (page: string) => void;
-  columnData: Column[];
-  actions: {
-    createAction: (params: { collection: string; item: any }) => UnknownAction;
-    updateAction: (params: { collection: string; item: any }) => UnknownAction;
-    deleteAction: (params: { collection: string; id: string }) => UnknownAction;
-    getAction: (params: {
-      collection?: string;
-      page: number;
-      limit: number;
-    }) => UnknownAction;
-    setCollectionData: (params: {
-      collection: string;
-      data: any;
-    }) => UnknownAction;
-  };
-  paginationModel: { page: number; pageSize: number };
-  setPaginationModel: (page: number, pageSize: number) => void;
+  columnData: any[];
+  actions: any;
 }
 interface RowData {
   id: string;
