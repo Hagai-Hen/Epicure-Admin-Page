@@ -7,7 +7,7 @@ import CreateDialog from "../Dialogs/CreateDialog";
 import EditDialog from "../Dialogs/EditDialog";
 import DeleteDialog from "../Dialogs/DeleteDialog";
 import { GridColDef } from "@mui/x-data-grid";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   CustomPaper,
   DashboardContainer,
@@ -22,6 +22,9 @@ import {
   DashboardHeaderEntries,
 } from "./styles";
 import { UnknownAction } from "@reduxjs/toolkit";
+import { RootState } from "../../redux/store";
+import { useAuthContext } from "../../context/useAuthContext";
+import { Box, Skeleton } from "@mui/material";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
@@ -32,18 +35,30 @@ interface DashboardProps {
   setActivePage: (page: string) => void;
   columnData: Column[];
   actions: {
-    setAction: (data: any[]) => void;
-    createAction: (data: any) => UnknownAction;
-    updateAction: (data: any) => UnknownAction;
-    deleteAction: (id: string) => UnknownAction;
+    createAction: (params: { collection: string; item: any }) => UnknownAction;
+    updateAction: (params: { collection: string; item: any }) => UnknownAction;
+    deleteAction: (params: { collection: string; id: string }) => UnknownAction;
+    getAction: (params: {
+      collection?: string;
+      page: number;
+      limit: number;
+    }) => UnknownAction;
+    setCollectionData: (params: {
+      collection: string;
+      data: any;
+    }) => UnknownAction;
   };
+  paginationModel: { page: number; pageSize: number };
+  setPaginationModel: (page: number, pageSize: number) => void;
 }
 interface RowData {
   id: string;
+  dishes?: { id: string; name?: string }[];
+  restaurants?: { id: string; name?: string }[];
+  restaurant?: { id: string };
 }
 
 export const Dashboard = ({
-  data,
   setActivePage,
   columnData,
   actions,
@@ -53,18 +68,25 @@ export const Dashboard = ({
 
   const [editingRow, setEditingRow] = useState<RowData | null>(null);
   const [editedRowData, setEditedRowData] = useState<RowData>({ id: "" });
-  const [rowsData, setRowsData] = useState<RowData[]>(data);
+  const [rowsData, setRowsData] = useState<RowData[]>();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<RowData | null>(null);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [isEditFormValid, setIsEditFormValid] = useState(true);
+  const [data, setData] = useState([]);
+  const { authUser } = useAuthContext();
 
-  const paginationModel = { page: 0, pageSize: 5 };
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 5,
+  });
 
   const newRowDataInitial = useMemo(() => {
     return columnData.reduce((acc: any, col: Column) => {
-      if (col.field !== "actions") acc[col.field] = "";
+      if (col.field !== "actions" && col.field !== "img") {
+        acc[col.field] = "";
+      }
       return acc;
     }, {});
   }, [columnData]);
@@ -76,9 +98,21 @@ export const Dashboard = ({
   if (collection)
     displayName = collection.charAt(0).toUpperCase() + collection.slice(1);
 
+  const pagination = useSelector(
+    (state: RootState) =>
+      state?.collections[collection?.toLowerCase() || ""]?.pagination
+  );
+
   useEffect(() => {
     setActivePage(collection || "");
-    setRowsData(data);
+    setData([]);
+    dispatch(
+      actions.getAction({
+        collection: collection?.toLowerCase(),
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      })
+    );
   }, [collection]);
 
   const handleCreateDialogOpen = useCallback(() => {
@@ -87,20 +121,45 @@ export const Dashboard = ({
   const handleCreateFieldChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
+
       const updatedRowData = { ...newRowData, [name]: value };
       setNewRowData(updatedRowData);
-      const isValid = Object.values(updatedRowData).every((val) => val !== "");
+
+      const isValid = Object.entries(updatedRowData).every(
+        ([fieldName, val]) => {
+          if (
+            Array.isArray(val) &&
+            fieldName !== "dishes" &&
+            fieldName !== "tags"
+          ) {
+            return val.length > 0;
+          } else {
+            return val !== "";
+          }
+        }
+      );
       setIsFormValid(isValid);
     },
     [newRowData]
   );
-
   const handleSaveCreate = useCallback(() => {
-    const newRow = { id: `${data.length + 1}`, ...newRowData };
-    dispatch(actions.createAction(newRow));
-    setRowsData((prevRows) => [...prevRows, newRow]);
-    setNewRowData({});
+    dispatch(
+      actions.createAction({
+        collection: collection?.toLowerCase() || "",
+        item: newRowData,
+      })
+    );
+    setTimeout(() => {
+      dispatch(
+        actions.getAction({
+          collection: collection?.toLowerCase(),
+          page: paginationModel.page,
+          limit: paginationModel.pageSize,
+        })
+      );
+    }, 500);
     setOpenCreateDialog(false);
+    setIsFormValid(false);
   }, [rowsData, newRowData]);
 
   const handleCancelCreate = useCallback(() => {
@@ -111,20 +170,45 @@ export const Dashboard = ({
 
   const handleDelete = useCallback(
     (id: string) => {
-      const row = rowsData.find((row) => row.id === id);
-      if (row) setRowToDelete(row);
-      setOpenDeleteDialog(true);
+      const row = rowsData?.find((row) => row.id === id);
+      if (row) {
+        setRowToDelete(row);
+        setOpenDeleteDialog(true);
+      }
     },
     [rowsData]
   );
 
   const confirmDelete = useCallback(() => {
     if (rowToDelete) {
-      dispatch(actions.deleteAction(rowToDelete.id));
+      dispatch(
+        actions.deleteAction({
+          collection: collection?.toLowerCase() || "",
+          id: rowToDelete.id,
+        })
+      );
+      setData((prevData) => {
+        return prevData.filter((item: any) => item.id !== rowToDelete.id);
+      });
+      setTimeout(() => {
+        dispatch(
+          actions.getAction({
+            collection: collection?.toLowerCase(),
+            page: paginationModel.page,
+            limit: paginationModel.pageSize,
+          })
+        );
+      }, 500);
       setRowToDelete(null);
     }
     setOpenDeleteDialog(false);
-  }, [rowToDelete]);
+  }, [
+    rowToDelete,
+    collection,
+    paginationModel.page,
+    paginationModel.pageSize,
+    dispatch,
+  ]);
 
   const cancelDelete = useCallback(() => {
     setRowToDelete(null);
@@ -133,7 +217,11 @@ export const Dashboard = ({
 
   const handleEdit = useCallback((row: RowData) => {
     setEditingRow(row);
-    setEditedRowData({ ...row });
+    setEditedRowData({
+      ...row,
+      dishes: row.dishes ? [] : row.dishes,
+      restaurants: row.restaurants ? [] : row.restaurants,
+    });
   }, []);
 
   const handleFieldChange = useCallback(
@@ -141,7 +229,9 @@ export const Dashboard = ({
       const { name, value } = e.target;
       setEditedRowData((prev: any) => {
         const updated = { ...prev, [name]: value };
-        const isValid = Object.values(updated).every((val) => val !== "");
+        const isValid = Object.values(updated).every((val) => {
+          return val !== "";
+        });
         setIsEditFormValid(isValid);
         return updated;
       });
@@ -150,13 +240,47 @@ export const Dashboard = ({
   );
 
   const handleSaveEdit = useCallback(() => {
-    const updatedRows = rowsData.map((row) =>
-      row.id === editingRow?.id ? { ...row, ...editedRowData } : row
-    );
+    let editedDishes = editedRowData?.dishes;
+    if (editedDishes?.length === 0) {
+      editedDishes = editingRow?.dishes;
+    }
+
+    let editedRests = editedRowData?.restaurants;
+    if (editedRests?.length === 0) {
+      editedRests = editingRow?.restaurants;
+    }
+    const editedData = {
+      ...editedRowData,
+      dishes: editedDishes,
+      restaurants: editedRests,
+    };
     setEditingRow(null);
-    setRowsData(updatedRows);
-    dispatch(actions.updateAction(editedRowData));
-  }, [rowsData, editingRow, editedRowData]);
+    dispatch(
+      actions.updateAction({
+        collection: collection?.toLowerCase() || "",
+        item: editedData,
+      })
+    );
+
+    dispatch(
+      actions.getAction({
+        collection: collection?.toLowerCase(),
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      })
+    );
+  }, [editedRowData, collection, paginationModel, dispatch]);
+
+  const updatedData: any = useSelector(
+    (state: RootState) =>
+      state.collections[collection?.toLowerCase() || ""]?.items
+  );
+
+  useEffect(() => {
+    if (updatedData) {
+      setData(updatedData);
+    }
+  }, [updatedData]);
 
   const handleCancelEdit = useCallback(() => {
     setEditingRow(null);
@@ -166,16 +290,57 @@ export const Dashboard = ({
     navigate(-1);
   }, [navigate]);
 
-  const updatedColumns = columnData.map((col) => {
-    if (col.field === "actions") {
-      return {
-        ...col,
-        renderCell: (params: any) =>
-          renderActionsCell({ ...params, api: { gridOptions } }),
-      };
+  const [loadedPages, setLoadedPages] = useState<Set<number>>(new Set());
+
+  const fetchDataForPage = async (page: number) => {
+    if (loadedPages.has(page)) {
+      setRowsData(
+        data.slice(
+          paginationModel.page * paginationModel.pageSize,
+          (paginationModel.page + 1) * paginationModel.pageSize
+        )
+      );
+      return;
     }
-    return col;
-  });
+    dispatch(
+      actions.getAction({
+        collection: collection?.toLowerCase(),
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+      })
+    );
+
+    setRowsData(
+      data.slice(
+        paginationModel.page * paginationModel.pageSize,
+        (paginationModel.page + 1) * paginationModel.pageSize
+      )
+    );
+
+    setLoadedPages((prev) => new Set(prev).add(page));
+  };
+
+  useEffect(() => {
+    fetchDataForPage(paginationModel.page);
+  }, [paginationModel.page, paginationModel.pageSize, data]);
+
+  const updatedColumns = columnData
+    .filter((col) => col.field !== "chef")
+    .map((col) => {
+      if (col.field === "actions") {
+        if (authUser?.role === "ADMIN") {
+          return {
+            ...col,
+            renderCell: (params: any) =>
+              renderActionsCell({ ...params, api: { gridOptions } }),
+          };
+        } else {
+          return null;
+        }
+      }
+      return col;
+    })
+    .filter((col) => col !== null);
 
   const gridOptions = {
     handleEdit,
@@ -193,22 +358,26 @@ export const Dashboard = ({
             </DashboardBackContainer>
             <DashboardHeaderTitle>{displayName}</DashboardHeaderTitle>
             <DashboardHeaderEntries>
-              {data.length} {DASHBOARD.HEADER.ENTRIES}
+              {pagination?.totalItems} {DASHBOARD.HEADER.ENTRIES}
             </DashboardHeaderEntries>
           </DashboardLeftHeader>
           <DashboardRightHeader>
-            <DashboardCreateButton onClick={handleCreateDialogOpen}>
-              {DASHBOARD.HEADER.CREATE_BUTTON}
-            </DashboardCreateButton>
+            {authUser && (
+              <DashboardCreateButton onClick={handleCreateDialogOpen}>
+                {DASHBOARD.HEADER.CREATE_BUTTON}
+              </DashboardCreateButton>
+            )}
           </DashboardRightHeader>
         </DashboardHeaderContainer>
         <CustomPaper>
           <DataGrid
-            rows={data}
+            rows={rowsData}
             columns={updatedColumns}
-            initialState={{ pagination: { paginationModel } }}
-            pageSizeOptions={[5, 10]}
-            checkboxSelection
+            pagination
+            paginationMode="server"
+            rowCount={pagination?.totalItems}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
           />
         </CustomPaper>
       </DashboardContainer>
@@ -222,6 +391,7 @@ export const Dashboard = ({
         onSave={handleSaveCreate}
         onCancel={handleCancelCreate}
         setNewRowData={setNewRowData}
+        collection={collection}
       />
 
       <EditDialog
@@ -232,6 +402,7 @@ export const Dashboard = ({
         onFieldChange={handleFieldChange}
         onSave={handleSaveEdit}
         onCancel={handleCancelEdit}
+        collection={collection}
       />
 
       <DeleteDialog

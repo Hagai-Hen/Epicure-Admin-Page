@@ -18,7 +18,7 @@ interface ParamsInterface {
 export const renderActionsCell = (params: ParamsInterface) => {
   return (
     <>
-      <IconButton
+       <IconButton
         onClick={() => params.api.gridOptions.handleEdit(params.row)}
         color="default"
       >
@@ -30,12 +30,40 @@ export const renderActionsCell = (params: ParamsInterface) => {
       >
         <DeleteIcon />
       </IconButton>
+
     </>
   );
 };
 
 export const renderImgCell = (params: ParamsInterface) => {
   return <TableImg src={params.value} />;
+};
+
+export const dishesRenderCell = (params: any) => {
+  const dishes = params.row.dishes;
+  if (dishes) {
+    const dishNames = dishes
+      .map((dish: { id: string; name: string }) => dish?.name)
+      .join(", ");
+    return <span>{dishNames}</span>;
+  }
+};
+
+export const restaurantsRenderCell = (params: any) => {
+  const restaurants = params.row.restaurants;
+  if (restaurants) {
+    const restaurantNames = restaurants
+      .map((dish: { id: string; name: string }) => dish?.name)
+      .join(", ");
+    return <span>{restaurantNames}</span>;
+  }
+};
+
+export const restaurantRenderCell = (params: any) => {
+  const restaurant = params.row.restaurant;
+  if (restaurant) {
+    return <span>{restaurant.name}</span>;
+  }
 };
 
 export const RestaurantColumns = [

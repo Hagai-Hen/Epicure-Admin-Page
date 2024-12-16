@@ -4,7 +4,8 @@ export const ROUTES = {
     DISHES: "/dishes",
     RESTAURANTS: "/restaurants",
     COLLECTIONS: "/collections",
-    COLLECTION: "/:collection"
+    COLLECTION: "/:collection",
+    LOGIN: "/login",
 }
 
 export const PAGE_NAMES = {

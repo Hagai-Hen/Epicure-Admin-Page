@@ -62,6 +62,8 @@ export const DashboardLeftHeader = styled.div`
 
 export const DashboardRightHeader = styled.div`
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 `;
 
 export const DashboardCreateButton = styled.button`
@@ -81,7 +83,28 @@ export const CustomPaper = styled(Paper)`
 `;
 
 export const TableImg = styled.img`
-  width: 100%;
+  width: 100px;
   height: auto;
   border-radius: 8px;
+`;
+
+export const DialogImg = styled.img`
+  max-width: 100px;
+  margin-top: 8px;
+`;
+
+export const UploadButton = styled.label`
+  background-color: ${colors.borderButtonColor};
+  margin: 0;
+  margin-top: 30px;
+  padding: 5px 15px;
+  height: 35%;
+  color: ${colors.white};
+  font-size: ${FONT_SIZE.SML};
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
+export const UploadInput = styled.input`
+  display: none;
 `;
