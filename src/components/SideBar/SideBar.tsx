@@ -7,7 +7,6 @@ import {
   SideBarCollectionCount,
   SideBarTitleContainer,
   SideBarHeader,
-  CustomSearchIcon,
   HeaderText,
   Divider,
   LogoutIcon,
@@ -18,8 +17,6 @@ import { SIDE_BAR } from "../../resources/content";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 import { useAuthContext } from "../../context/useAuthContext";
-import { Login } from "@mui/icons-material";
-import { Typography } from "@mui/material";
 
 interface SideBarProps {
   collections: string[];

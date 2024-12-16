@@ -78,7 +78,7 @@ const EditDialog: React.FC<EditDialogProps> = ({
     }
   };
 
-  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     const { name, value } = e.target;
 
     if (name === "rate") {
