@@ -1,5 +1,3 @@
-import { fetchData } from "../api/collectionApi";
-
 import {
   renderImgCell,
   renderActionsCell,
@@ -78,12 +76,7 @@ export const COLLECTIONS_DATA = {
         field: "chef",
         headerName: "Chef",
         type: "list",
-        options: await fetchData("chefs").then((chefs) =>
-          chefs?.map((chef) => ({
-            id: chef.id,
-            name: chef.name,
-          }))
-        ),
+        options: [],
         width: 130,
       },
       {
@@ -100,12 +93,7 @@ export const COLLECTIONS_DATA = {
         field: "dishes",
         headerName: "Dishes",
         type: "list",
-        options: await fetchData("dishes").then((dishes) =>
-          dishes?.map((dish) => ({
-            id: dish.id,
-            name: dish.name,
-          }))
-        ),
+        options: [],
         renderCell: dishesRenderCell,
         multiple: true,
         width: 130,
@@ -150,12 +138,7 @@ export const COLLECTIONS_DATA = {
         field: "restaurants",
         headerName: "Restaurants",
         type: "list",
-        options: await fetchData("restaurants").then((restaurants) =>
-          restaurants?.map((restaurant) => ({
-            id: restaurant.id,
-            name: restaurant.name,
-          }))
-        ),
+        options: [],
         renderCell: restaurantsRenderCell,
         multiple: true,
         width: 130,
@@ -205,12 +188,7 @@ export const COLLECTIONS_DATA = {
         field: "restaurant",
         headerName: "Restaurant",
         type: "list",
-        options: await fetchData("restaurants").then((restaurants) =>
-          restaurants?.map((restaurant) => ({
-            id: restaurant.id,
-            name: restaurant.name,
-          }))
-        ),
+        options: [],
         renderCell: restaurantRenderCell,
         width: 130,
       },
