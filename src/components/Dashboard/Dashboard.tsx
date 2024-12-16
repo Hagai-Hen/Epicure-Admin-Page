@@ -24,6 +24,7 @@ import {
 import { UnknownAction } from "@reduxjs/toolkit";
 import { RootState } from "../../redux/store";
 import { useAuthContext } from "../../context/useAuthContext";
+import { Box, Skeleton } from "@mui/material";
 
 interface Column extends Omit<GridColDef, "renderCell"> {
   renderCell?: (params: any) => JSX.Element;
@@ -126,7 +127,11 @@ export const Dashboard = ({
 
       const isValid = Object.entries(updatedRowData).every(
         ([fieldName, val]) => {
-          if (Array.isArray(val) && fieldName !== "dishes" && fieldName !== "tags") {
+          if (
+            Array.isArray(val) &&
+            fieldName !== "dishes" &&
+            fieldName !== "tags"
+          ) {
             return val.length > 0;
           } else {
             return val !== "";
